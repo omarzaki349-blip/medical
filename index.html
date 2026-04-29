@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام المركز الطبي</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #0f4c75;
+  --primary-light: #1b6ca8;
+  --accent: #00b4d8;
+  --accent2: #06d6a0;
+  --danger: #ef233c;
+  --warn: #f4a261;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --sidebar: #0a2540;
+  --text: #1a202c;
+  --text2: #4a5568;
+  --border: #e2e8f0;
+  --shadow: 0 2px 16px rgba(15,76,117,.10);
+  --radius: 14px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'IBM Plex Sans Arabic',sans-serif; background:var(--bg); color:var(--text); direction:rtl; }
+
+/* ── Layout ── */
+.layout { display:flex; min-height:100vh; }
+.sidebar {
+  width:250px; background:var(--sidebar); color:#e2e8f0;
+  display:flex; flex-direction:column; position:fixed; height:100vh; z-index:100;
+  right:0; transition:.3s;
+}
+.main-content { margin-right:250px; flex:1; min-height:100vh; }
+
+/* ── Sidebar ── */
+.sidebar-logo {
+  padding:28px 20px 20px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.sidebar-logo h2 { font-size:1.1rem; font-weight:700; color:#fff; line-height:1.4; }
+.sidebar-logo p { font-size:.75rem; color:#7fa8c9; margin-top:3px; }
+
+.nav-section { padding:12px 0; }
+.nav-section-title { font-size:.65rem; color:#4a6fa5; padding:8px 20px 4px; text-transform:uppercase; letter-spacing:1px; }
+.nav-item {
+  display:flex; align-items:center; gap:10px;
+  padding:11px 20px; cursor:pointer; transition:.2s;
+  color:#a0b4c8; font-size:.9rem; border-right:3px solid transparent;
+}
+.nav-item:hover { background:rgba(255,255,255,.06); color:#fff; }
+.nav-item.active { background:rgba(0,180,216,.12); color:var(--accent); border-right-color:var(--accent); }
+.nav-icon { font-size:1.1rem; width:22px; text-align:center; }
+
+.sidebar-user {
+  margin-top:auto; padding:16px 20px;
+  border-top:1px solid rgba(255,255,255,.08);
+  display:flex; align-items:center; gap:10px;
+}
+.user-avatar {
+  width:36px; height:36px; border-radius:50%; background:var(--primary-light);
+  display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:.85rem;
+}
+.user-info p { font-size:.85rem; color:#fff; font-weight:600; }
+.user-info span { font-size:.72rem; color:#7fa8c9; }
+
+/* ── Top Bar ── */
+.topbar {
+  background:#fff; padding:14px 28px; display:flex; align-items:center;
+  justify-content:space-between; border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:50;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+.topbar-title { font-size:1.15rem; font-weight:700; color:var(--primary); }
+.topbar-actions { display:flex; gap:10px; align-items:center; }
+.date-badge {
+  background:var(--bg); padding:6px 14px; border-radius:20px;
+  font-size:.82rem; color:var(--text2); font-weight:500;
+}
+
+/* ── Pages ── */
+.page { display:none; padding:24px 28px; }
+.page.active { display:block; }
+
+/* ── Cards ── */
+.card {
+  background:var(--card); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:22px;
+  border:1px solid rgba(0,0,0,.04);
+}
+.card-title { font-size:1rem; font-weight:700; color:var(--primary); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+
+/* ── Stats Grid ── */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:24px; }
+.stat-card {
+  background:var(--card); border-radius:var(--radius);
+  padding:20px; border:1px solid rgba(0,0,0,.04);
+  box-shadow:var(--shadow); position:relative; overflow:hidden;
+  transition:.2s;
+}
+.stat-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(15,76,117,.14); }
+.stat-card::before {
+  content:''; position:absolute; top:0; right:0; width:4px; height:100%;
+}
+.stat-card.blue::before { background:var(--primary-light); }
+.stat-card.green::before { background:var(--accent2); }
+.stat-card.orange::before { background:var(--warn); }
+.stat-card.red::before { background:var(--danger); }
+.stat-card.cyan::before { background:var(--accent); }
+.stat-card.purple::before { background:#7c3aed; }
+
+.stat-icon { font-size:2rem; margin-bottom:8px; }
+.stat-value { font-size:1.7rem; font-weight:800; color:var(--primary); line-height:1; }
+.stat-label { font-size:.78rem; color:var(--text2); margin-top:4px; font-weight:500; }
+.stat-sub { font-size:.72rem; color:#a0aec0; margin-top:2px; }
+
+/* ── Tables ── */
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:.875rem; }
+th {
+  background:#f7fafc; padding:11px 14px; text-align:right;
+  font-weight:700; color:var(--text2); font-size:.78rem;
+  border-bottom:2px solid var(--border); white-space:nowrap;
+}
+td { padding:11px 14px; border-bottom:1px solid var(--border); color:var(--text); vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:#f7fafc; }
+
+/* ── Badges ── */
+.badge {
+  display:inline-block; padding:3px 10px; border-radius:20px;
+  font-size:.72rem; font-weight:700;
+}
+.badge-pending { background:#fff3cd; color:#856404; }
+.badge-confirmed { background:#d1ecf1; color:#0c5460; }
+.badge-completed { background:#d4edda; color:#155724; }
+.badge-cancelled { background:#f8d7da; color:#721c24; }
+.badge-paid { background:#d4edda; color:#155724; }
+.badge-partial { background:#fff3cd; color:#856404; }
+.badge-unpaid { background:#f8d7da; color:#721c24; }
+.badge-income { background:#d4edda; color:#155724; }
+.badge-expense { background:#f8d7da; color:#721c24; }
+
+/* ── Forms ── */
+.form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+.form-group { display:flex; flex-direction:column; gap:5px; }
+.form-group label { font-size:.8rem; font-weight:600; color:var(--text2); }
+.form-group input, .form-group select, .form-group textarea {
+  padding:9px 13px; border:1.5px solid var(--border); border-radius:8px;
+  font-family:inherit; font-size:.875rem; color:var(--text);
+  transition:.2s; direction:rtl;
+}
+.form-group input:focus, .form-group select:focus {
+  outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,180,216,.12);
+}
+
+/* ── Buttons ── */
+.btn {
+  padding:9px 18px; border:none; border-radius:8px; cursor:pointer;
+  font-family:inherit; font-size:.875rem; font-weight:600;
+  transition:.2s; display:inline-flex; align-items:center; gap:6px;
+}
+.btn-primary { background:var(--primary); color:#fff; }
+.btn-primary:hover { background:var(--primary-light); }
+.btn-accent { background:var(--accent); color:#fff; }
+.btn-accent:hover { background:#009dc0; }
+.btn-success { background:var(--accent2); color:#fff; }
+.btn-success:hover { background:#05b884; }
+.btn-danger { background:var(--danger); color:#fff; }
+.btn-danger:hover { background:#c81e31; }
+.btn-warning { background:var(--warn); color:#fff; }
+.btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--text2); }
+.btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+.btn-sm { padding:6px 12px; font-size:.78rem; border-radius:6px; }
+
+/* ── Modal ── */
+.modal-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.5);
+  z-index:999; align-items:center; justify-content:center; padding:20px;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:#fff; border-radius:18px; width:100%; max-width:580px;
+  max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.3);
+  animation:slideUp .3s ease;
+}
+@keyframes slideUp { from { transform:translateY(30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+.modal-header {
+  padding:20px 24px 16px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.modal-header h3 { font-size:1.1rem; font-weight:800; color:var(--primary); }
+.modal-close { font-size:1.4rem; cursor:pointer; color:var(--text2); background:none; border:none; line-height:1; }
+.modal-body { padding:20px 24px; }
+.modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; }
+
+/* ── Invoice Builder ── */
+.services-list { display:flex; flex-direction:column; gap:8px; margin:12px 0; }
+.service-row {
+  display:flex; align-items:center; gap:10px;
+  background:#f7fafc; padding:10px 12px; border-radius:8px;
+}
+.service-row select, .service-row input { flex:1; padding:7px 10px; border:1.5px solid var(--border); border-radius:6px; font-family:inherit; font-size:.82rem; }
+.invoice-total {
+  background:linear-gradient(135deg,var(--primary),var(--primary-light));
+  color:#fff; border-radius:10px; padding:14px 18px; margin-top:12px;
+  display:flex; justify-content:space-between; align-items:center; font-weight:700;
+}
+
+/* ── Calendar / Schedule ── */
+.schedule-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+.doctor-schedule { background:var(--card); border-radius:12px; padding:16px; border:1px solid var(--border); }
+.doctor-schedule h4 { font-size:.9rem; font-weight:700; color:var(--primary); margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--accent); }
+.appt-slot {
+  display:flex; align-items:center; gap:10px;
+  padding:8px 10px; border-radius:8px; margin-bottom:6px;
+  background:#f7fafc; font-size:.83rem;
+}
+.appt-slot.empty { color:#a0aec0; font-style:italic; }
+.time-badge { background:var(--primary); color:#fff; padding:2px 8px; border-radius:4px; font-size:.75rem; font-weight:700; }
+
+/* ── Dashboard Chart ── */
+.chart-bars { display:flex; align-items:flex-end; gap:8px; height:120px; padding:10px 0; }
+.chart-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; }
+.chart-bar {
+  width:100%; background:linear-gradient(180deg,var(--accent),var(--primary-light));
+  border-radius:4px 4px 0 0; min-height:4px; transition:.8s ease;
+}
+.chart-label { font-size:.65rem; color:var(--text2); }
+
+/* ── Treasury ── */
+.treasury-header {
+  background:linear-gradient(135deg,#0a2540,#0f4c75);
+  color:#fff; border-radius:14px; padding:24px; margin-bottom:20px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.balance-amount { font-size:2.2rem; font-weight:800; }
+
+/* ── Tabs ── */
+.tabs { display:flex; gap:4px; background:#f0f4f8; padding:4px; border-radius:10px; margin-bottom:20px; width:fit-content; }
+.tab { padding:8px 18px; border-radius:7px; cursor:pointer; font-size:.85rem; font-weight:600; color:var(--text2); transition:.2s; border:none; background:none; font-family:inherit; }
+.tab.active { background:#fff; color:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,.08); }
+
+/* ── Toast ── */
+.toast {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  background:#1a202c; color:#fff; padding:12px 24px; border-radius:30px;
+  font-size:.875rem; font-weight:600; z-index:9999;
+  box-shadow:0 8px 24px rgba(0,0,0,.2); opacity:0; transition:.3s;
+  pointer-events:none; white-space:nowrap;
+}
+.toast.show { opacity:1; }
+
+/* ── Login ── */
+.login-page {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#0a2540 0%,#0f4c75 50%,#1b6ca8 100%);
+}
+.login-card {
+  background:#fff; border-radius:20px; padding:40px; width:100%; max-width:400px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+.login-logo { text-align:center; margin-bottom:28px; }
+.login-logo h1 { color:var(--primary); font-size:1.6rem; font-weight:800; }
+.login-logo p { color:var(--text2); font-size:.85rem; margin-top:4px; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:#f1f5f9; }
+::-webkit-scrollbar-thumb { background:#cbd5e0; border-radius:3px; }
+
+/* ── Responsive ── */
+@media (max-width:768px) {
+  .sidebar { width:200px; }
+  .main-content { margin-right:200px; }
+  .stats-grid { grid-template-columns:repeat(2,1fr); }
+  .page { padding:16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">
+      <div style="font-size:3rem;margin-bottom:8px;">🏥</div>
+      <h1>المركز الطبي</h1>
+      <p>نظام إدارة المركز الطبي المتكامل</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="form-group">
+        <label>اسم المستخدم</label>
+        <input type="text" id="loginUser" placeholder="admin" value="admin">
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور</label>
+        <input type="password" id="loginPass" placeholder="••••••••" value="admin123">
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;" onclick="doLogin()">
+        🔐 دخول
+      </button>
+      <p style="text-align:center;font-size:.75rem;color:#a0aec0;">
+        admin / admin123 — للمدير &nbsp;|&nbsp; reception / rec123 — للاستقبال
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN SYSTEM -->
+<div class="layout" id="mainApp" style="display:none;">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <h2>🏥 المركز الطبي</h2>
+      <p>نظام الإدارة المتكامل</p>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">الرئيسية</div>
+      <div class="nav-item active" onclick="showPage('dashboard',this)">
+        <span class="nav-icon">📊</span> لوحة التحكم
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">المرضى والحجوزات</div>
+      <div class="nav-item" onclick="showPage('appointments',this)">
+        <span class="nav-icon">📅</span> الحجوزات
+      </div>
+      <div class="nav-item" onclick="showPage('patients',this)">
+        <span class="nav-icon">🧑‍🤝‍🧑</span> المرضى
+      </div>
+      <div class="nav-item" onclick="showPage('doctors',this)">
+        <span class="nav-icon">👨‍⚕️</span> الأطباء
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">المالية</div>
+      <div class="nav-item" onclick="showPage('invoices',this)">
+        <span class="nav-icon">🧾</span> الفواتير
+      </div>
+      <div class="nav-item" onclick="showPage('treasury',this)">
+        <span class="nav-icon">💰</span> الخزنة
+      </div>
+      <div class="nav-item" onclick="showPage('reports',this)">
+        <span class="nav-icon">📈</span> التقارير
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">بوت تيليجرام</div>
+      <div class="nav-item" onclick="showPage('telegram',this)">
+        <span class="nav-icon">✈️</span> إعداد البوت
+      </div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="userAvatar">م</div>
+      <div class="user-info">
+        <p id="userName">المدير</p>
+        <span id="userRole">مدير النظام</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-title" id="pageTitle">لوحة التحكم</div>
+      <div class="topbar-actions">
+        <div class="date-badge" id="currentDate"></div>
+        <button class="btn btn-outline btn-sm" onclick="doLogout()">🚪 خروج</button>
+      </div>
+    </div>
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon">💰</div>
+          <div class="stat-value" id="stat-revenue">—</div>
+          <div class="stat-label">إيرادات اليوم</div>
+          <div class="stat-sub">جنيه مصري</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">📅</div>
+          <div class="stat-value" id="stat-appts">—</div>
+          <div class="stat-label">حجوزات اليوم</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="stat-icon">🧑‍🤝‍🧑</div>
+          <div class="stat-value" id="stat-patients">—</div>
+          <div class="stat-label">مرضى اليوم</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon">🧾</div>
+          <div class="stat-value" id="stat-pending-inv">—</div>
+          <div class="stat-label">فواتير غير مسددة</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">📊</div>
+          <div class="stat-value" id="stat-monthly">—</div>
+          <div class="stat-label">إيرادات الشهر</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">🏦</div>
+          <div class="stat-value" id="stat-treasury">—</div>
+          <div class="stat-label">رصيد الخزنة</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px;">
+        <!-- Weekly Chart -->
+        <div class="card">
+          <div class="card-title">📈 إيرادات آخر 7 أيام</div>
+          <div class="chart-bars" id="weeklyChart"></div>
+        </div>
+        <!-- Doctor Stats -->
+        <div class="card">
+          <div class="card-title">👨‍⚕️ الأطباء اليوم</div>
+          <div id="doctorStatsToday" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+      </div>
+
+      <!-- Recent Appointments -->
+      <div class="card">
+        <div class="card-title">📋 آخر الحجوزات
+          <button class="btn btn-accent btn-sm" style="margin-right:auto;" onclick="showPage('appointments',null)">عرض الكل</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>المريض</th><th>الطبيب</th><th>التاريخ</th><th>الوقت</th><th>الحالة</th></tr></thead>
+            <tbody id="recentAppointments"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── APPOINTMENTS ── -->
+    <div class="page" id="page-appointments">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="date" id="apptDateFilter" class="form-group input" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+          <select id="apptDoctorFilter" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;" onchange="loadAppointments()">
+            <option value="">كل الأطباء</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="loadAppointments()">🔍 بحث</button>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('addApptModal')">+ حجز جديد</button>
+      </div>
+
+      <!-- Schedule view -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">📋 جدول اليوم</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>المريض</th><th>تليفون</th><th>الطبيب</th><th>الوقت</th><th>الحالة</th><th>إجراء</th></tr></thead>
+            <tbody id="appointmentsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PATIENTS ── -->
+    <div class="page" id="page-patients">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="display:flex;gap:10px;">
+          <input type="text" id="patientSearch" placeholder="🔍 ابحث بالاسم أو التليفون..." style="padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;min-width:280px;" oninput="searchPatients()">
+        </div>
+        <button class="btn btn-primary" onclick="openModal('addPatientModal')">+ مريض جديد</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>الاسم</th><th>التليفون</th><th>تاريخ الميلاد</th><th>العنوان</th><th>تسجيل</th><th>إجراء</th></tr></thead>
+            <tbody id="patientsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DOCTORS ── -->
+    <div class="page" id="page-doctors">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div></div>
+        <button class="btn btn-primary" onclick="openModal('addDoctorModal')">+ طبيب جديد</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;" id="doctorsGrid"></div>
+    </div>
+
+    <!-- ── INVOICES ── -->
+    <div class="page" id="page-invoices">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div class="tabs">
+          <button class="tab active" onclick="filterInvoices('',this)">الكل</button>
+          <button class="tab" onclick="filterInvoices('unpaid',this)">غير مسددة</button>
+          <button class="tab" onclick="filterInvoices('partial',this)">جزئية</button>
+          <button class="tab" onclick="filterInvoices('paid',this)">مسددة</button>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('addInvoiceModal')">+ فاتورة جديدة</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>المريض</th><th>الطبيب</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>طريقة الدفع</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th></tr></thead>
+            <tbody id="invoicesTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TREASURY ── -->
+    <div class="page" id="page-treasury">
+      <div class="treasury-header">
+        <div>
+          <div style="font-size:.85rem;opacity:.7;margin-bottom:4px;">رصيد الخزنة الحالي</div>
+          <div class="balance-amount" id="treasuryBalance">—</div>
+          <div style="font-size:.8rem;opacity:.6;margin-top:2px;">جنيه مصري</div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-success" onclick="openTreasury('income')">+ إيراد</button>
+          <button class="btn btn-danger" onclick="openTreasury('expense')">− مصروف</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 سجل المعاملات</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>النوع</th><th>الفئة</th><th>المبلغ</th><th>البيان</th><th>التاريخ</th></tr></thead>
+            <tbody id="treasuryTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REPORTS ── -->
+    <div class="page" id="page-reports">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title">📊 التقرير اليومي</div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;">
+          <input type="date" id="reportDate" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+          <button class="btn btn-primary" onclick="loadDailyReport()">عرض التقرير</button>
+        </div>
+        <div id="reportContent" style="display:none;">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+            <div class="stat-card green"><div class="stat-icon">💰</div><div class="stat-value" id="rpt-income">0</div><div class="stat-label">الإيرادات</div></div>
+            <div class="stat-card red"><div class="stat-icon">📤</div><div class="stat-value" id="rpt-expense">0</div><div class="stat-label">المصروفات</div></div>
+            <div class="stat-card blue"><div class="stat-icon">📊</div><div class="stat-value" id="rpt-net">0</div><div class="stat-label">الصافي</div></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>الطبيب</th><th>التخصص</th><th>الحجوزات</th><th>الإيرادات</th><th>المحصّل</th></tr></thead>
+              <tbody id="reportDoctors"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TELEGRAM BOT ── -->
+    <div class="page" id="page-telegram">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="card">
+          <div class="card-title">✈️ إعداد البوت</div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div class="form-group">
+              <label>Bot Token</label>
+              <input type="text" id="botToken" placeholder="1234567890:AAAA...">
+            </div>
+            <div class="form-group">
+              <label>Chat ID الأدمن</label>
+              <input type="text" id="adminChatId" placeholder="123456789">
+            </div>
+            <button class="btn btn-primary" onclick="saveBotConfig()">💾 حفظ الإعدادات</button>
+          </div>
+
+          <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+            <div class="card-title">📤 إرسال تقرير يدوي</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <button class="btn btn-accent" onclick="sendReport('admin')">📊 تقرير شامل للأدمن</button>
+              <button class="btn btn-outline" onclick="sendReport('doctors')">👨‍⚕️ تقارير الأطباء</button>
+              <button class="btn btn-outline" onclick="sendReport('all')">📬 إرسال للكل</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🔗 ربط الأطباء بالبوت</div>
+          <div id="doctorsBotList" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+
+        <div class="card" style="grid-column:span 2;">
+          <div class="card-title">📋 وظائف البوت</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+            <div style="background:#f0f9ff;border-radius:10px;padding:14px;border-right:3px solid var(--accent);">
+              <div style="font-size:1.5rem;margin-bottom:6px;">🧑‍💼</div>
+              <div style="font-weight:700;font-size:.9rem;color:var(--primary);">المريض</div>
+              <ul style="font-size:.8rem;color:var(--text2);margin-top:6px;padding-right:16px;line-height:2;">
+                <li>حجز موعد جديد</li>
+                <li>عرض مواعيده</li>
+                <li>التواصل مع المركز</li>
+              </ul>
+            </div>
+            <div style="background:#f0fdf4;border-radius:10px;padding:14px;border-right:3px solid var(--accent2);">
+              <div style="font-size:1.5rem;margin-bottom:6px;">👨‍⚕️</div>
+              <div style="font-weight:700;font-size:.9rem;color:var(--primary);">الطبيب</div>
+              <ul style="font-size:.8rem;color:var(--text2);margin-top:6px;padding-right:16px;line-height:2;">
+                <li>تقريره اليومي تلقائي</li>
+                <li>عدد مرضاه</li>
+                <li>إيراداته المحصّلة</li>
+              </ul>
+            </div>
+            <div style="background:#fff7ed;border-radius:10px;padding:14px;border-right:3px solid var(--warn);">
+              <div style="font-size:1.5rem;margin-bottom:6px;">👑</div>
+              <div style="font-weight:700;font-size:.9rem;color:var(--primary);">الأدمن</div>
+              <ul style="font-size:.8rem;color:var(--text2);margin-top:6px;padding-right:16px;line-height:2;">
+                <li>تقرير الإيرادات اليومي</li>
+                <li>حساب كل طبيب</li>
+                <li>إرسال تلقائي 10 مساءً</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /layout -->
+
+<!-- ══ MODALS ══ -->
+
+<!-- Add Appointment -->
+<div class="modal-overlay" id="addApptModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📅 حجز موعد جديد</h3>
+      <button class="modal-close" onclick="closeModal('addApptModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:span 2;">
+          <label>المريض</label>
+          <select id="appt-patient" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;"></select>
+        </div>
+        <div class="form-group">
+          <label>الطبيب</label>
+          <select id="appt-doctor" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;"></select>
+        </div>
+        <div class="form-group">
+          <label>التاريخ</label>
+          <input type="date" id="appt-date">
+        </div>
+        <div class="form-group">
+          <label>الوقت</label>
+          <select id="appt-time" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+            <option>09:00</option><option>09:30</option><option>10:00</option>
+            <option>10:30</option><option>11:00</option><option>11:30</option>
+            <option>12:00</option><option>12:30</option><option>13:00</option>
+            <option>13:30</option><option>14:00</option><option>14:30</option>
+            <option>15:00</option><option>15:30</option><option>16:00</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:span 2;">
+          <label>ملاحظات</label>
+          <input type="text" id="appt-notes" placeholder="ملاحظات اختيارية...">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addApptModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="submitAppointment()">✅ تأكيد الحجز</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Patient -->
+<div class="modal-overlay" id="addPatientModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🧑‍🤝‍🧑 مريض جديد</h3>
+      <button class="modal-close" onclick="closeModal('addPatientModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:span 2;">
+          <label>الاسم الكامل *</label>
+          <input type="text" id="pt-name" placeholder="اسم المريض">
+        </div>
+        <div class="form-group">
+          <label>رقم التليفون *</label>
+          <input type="text" id="pt-phone" placeholder="01xxxxxxxxx">
+        </div>
+        <div class="form-group">
+          <label>تاريخ الميلاد</label>
+          <input type="date" id="pt-bdate">
+        </div>
+        <div class="form-group" style="grid-column:span 2;">
+          <label>العنوان</label>
+          <input type="text" id="pt-address" placeholder="العنوان">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addPatientModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="submitPatient()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Doctor -->
+<div class="modal-overlay" id="addDoctorModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>👨‍⚕️ طبيب جديد</h3>
+      <button class="modal-close" onclick="closeModal('addDoctorModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:span 2;">
+          <label>اسم الطبيب *</label>
+          <input type="text" id="dr-name" placeholder="د. محمد أحمد">
+        </div>
+        <div class="form-group">
+          <label>التخصص</label>
+          <input type="text" id="dr-specialty" placeholder="طب عام">
+        </div>
+        <div class="form-group">
+          <label>رقم التليفون</label>
+          <input type="text" id="dr-phone" placeholder="01xxxxxxxxx">
+        </div>
+        <div class="form-group">
+          <label>رسوم الكشف (ج)</label>
+          <input type="number" id="dr-fee" placeholder="200">
+        </div>
+        <div class="form-group">
+          <label>Chat ID تيليجرام</label>
+          <input type="text" id="dr-telegram" placeholder="123456789">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addDoctorModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="submitDoctor()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Invoice -->
+<div class="modal-overlay" id="addInvoiceModal">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-header">
+      <h3>🧾 فاتورة جديدة</h3>
+      <button class="modal-close" onclick="closeModal('addInvoiceModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid" style="margin-bottom:16px;">
+        <div class="form-group">
+          <label>المريض *</label>
+          <select id="inv-patient" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;"></select>
+        </div>
+        <div class="form-group">
+          <label>الطبيب *</label>
+          <select id="inv-doctor" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;"></select>
+        </div>
+      </div>
+
+      <div class="card-title" style="margin-bottom:8px;">الخدمات</div>
+      <div class="services-list" id="servicesList">
+        <div class="service-row">
+          <select class="svc-name" onchange="updateSvcPrice(this)" style="flex:2;">
+            <option value="">اختر الخدمة...</option>
+          </select>
+          <input type="number" class="svc-price" placeholder="السعر" style="flex:1;" oninput="calcInvoiceTotal()">
+          <input type="number" class="svc-qty" value="1" min="1" style="flex:.6;width:60px;" oninput="calcInvoiceTotal()">
+          <button class="btn btn-danger btn-sm" onclick="removeSvcRow(this)">✕</button>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="addSvcRow()" style="margin-bottom:12px;">+ إضافة خدمة</button>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>خصم (ج)</label>
+          <input type="number" id="inv-discount" value="0" oninput="calcInvoiceTotal()">
+        </div>
+        <div class="form-group">
+          <label>طريقة الدفع</label>
+          <select id="inv-payment" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+            <option value="cash">كاش</option>
+            <option value="card">بطاقة</option>
+            <option value="transfer">تحويل</option>
+            <option value="vodafone">فودافون كاش</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>المدفوع (ج)</label>
+          <input type="number" id="inv-paid" value="0" oninput="calcInvoiceTotal()">
+        </div>
+        <div class="form-group">
+          <label>ملاحظات</label>
+          <input type="text" id="inv-notes" placeholder="ملاحظات...">
+        </div>
+      </div>
+
+      <div class="invoice-total">
+        <span>الإجمالي بعد الخصم:</span>
+        <span id="inv-total-display">0 ج</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addInvoiceModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="submitInvoice()">💾 حفظ الفاتورة</button>
+    </div>
+  </div>
+</div>
+
+<!-- Treasury Entry -->
+<div class="modal-overlay" id="treasuryModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <h3 id="treasuryModalTitle">إضافة معاملة</h3>
+      <button class="modal-close" onclick="closeModal('treasuryModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="form-group">
+          <label>الفئة</label>
+          <select id="tr-category" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+            <option>فواتير</option><option>رواتب</option><option>مشتريات</option>
+            <option>إيجار</option><option>كهرباء</option><option>أخرى</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>المبلغ (ج) *</label>
+          <input type="number" id="tr-amount" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label>البيان</label>
+          <input type="text" id="tr-desc" placeholder="وصف المعاملة">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('treasuryModal')">إلغاء</button>
+      <button class="btn btn-primary" id="treasurySubmitBtn" onclick="submitTreasury()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:5000/api';
+let currentUser = null;
+let services = [];
+let patients = [];
+let doctors = [];
+let treasuryType = 'income';
+let currentInvoiceFilter = '';
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  
+  // Demo mode — bypass backend
+  const users = {
+    'admin': {username:'admin',role:'admin',name:'المدير'},
+    'reception': {username:'reception',role:'reception',name:'موظف الاستقبال'}
+  };
+  const passwords = {'admin':'admin123','reception':'rec123'};
+  
+  if (users[u] && passwords[u] === p) {
+    currentUser = users[u];
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'flex';
+    document.getElementById('userName').textContent = currentUser.name;
+    document.getElementById('userRole').textContent = currentUser.role === 'admin' ? 'مدير النظام' : 'موظف استقبال';
+    document.getElementById('userAvatar').textContent = currentUser.name[0];
+    initApp();
+  } else {
+    toast('❌ بيانات خاطئة', 'error');
+  }
+}
+
+function doLogout() {
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  currentUser = null;
+}
+
+// ── App Init ─────────────────────────────────────────────────────────────────
+function initApp() {
+  setDateInputs();
+  loadDashboard();
+  loadPatients();
+  loadDoctors();
+  loadAppointments();
+  loadInvoices();
+  loadTreasury();
+  loadServicesForInvoice();
+  
+  // Update date display
+  const now = new Date();
+  const options = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  document.getElementById('currentDate').textContent = now.toLocaleDateString('ar-EG', options);
+}
+
+function setDateInputs() {
+  const today = new Date().toISOString().split('T')[0];
+  const inputs = ['apptDateFilter','appt-date','reportDate'];
+  inputs.forEach(id => { const el = document.getElementById(id); if(el) el.value = today; });
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+const titles = {
+  dashboard:'لوحة التحكم', appointments:'الحجوزات', patients:'المرضى',
+  doctors:'الأطباء', invoices:'الفواتير', treasury:'الخزنة',
+  reports:'التقارير', telegram:'بوت تيليجرام'
+};
+
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('pageTitle').textContent = titles[id] || id;
+  
+  if (id === 'appointments') { loadAppointments(); populateApptSelects(); }
+  if (id === 'invoices') loadInvoices();
+  if (id === 'treasury') loadTreasury();
+  if (id === 'telegram') loadDoctorsBotList();
+}
+
+// ── Demo Data ─────────────────────────────────────────────────────────────────
+function genDemoData() {
+  const demoPatients = [
+    {id:1,name:'أحمد محمد علي',phone:'01001234567',birth_date:'1990-05-15',address:'القاهرة',created_at:'2024-01-10'},
+    {id:2,name:'سارة إبراهيم',phone:'01112345678',birth_date:'1985-08-22',address:'الجيزة',created_at:'2024-02-14'},
+    {id:3,name:'محمود حسن',phone:'01223456789',birth_date:'1978-12-03',address:'الإسكندرية',created_at:'2024-03-05'},
+    {id:4,name:'فاطمة أحمد',phone:'01334567890',birth_date:'1995-07-19',address:'المنصورة',created_at:'2024-03-20'},
+    {id:5,name:'كريم عبدالله',phone:'01445678901',birth_date:'2001-02-28',address:'القاهرة',created_at:'2024-04-01'},
+  ];
+  
+  const demoDoctors = [
+    {id:1,name:'د. أحمد محمد',specialty:'طب عام',phone:'01001111111',fee:200,telegram_chat_id:''},
+    {id:2,name:'د. سارة علي',specialty:'طب أسنان',phone:'01002222222',fee:300,telegram_chat_id:''},
+    {id:3,name:'د. محمود حسن',specialty:'عيون',phone:'01003333333',fee:350,telegram_chat_id:''},
+  ];
+  
+  const today = new Date().toISOString().split('T')[0];
+  const demoAppts = [
+    {id:1,patient_name:'أحمد محمد علي',phone:'01001234567',doctor_name:'د. أحمد محمد',appointment_date:today,appointment_time:'09:00',status:'confirmed'},
+    {id:2,patient_name:'سارة إبراهيم',phone:'01112345678',doctor_name:'د. سارة علي',appointment_date:today,appointment_time:'09:30',status:'pending'},
+    {id:3,patient_name:'محمود حسن',phone:'01223456789',doctor_name:'د. محمود حسن',appointment_date:today,appointment_time:'10:00',status:'completed'},
+    {id:4,patient_name:'فاطمة أحمد',phone:'01334567890',doctor_name:'د. أحمد محمد',appointment_date:today,appointment_time:'10:30',status:'pending'},
+  ];
+  
+  const demoInvoices = [
+    {id:1,patient_name:'أحمد محمد علي',doctor_name:'د. أحمد محمد',total:350,paid:350,discount:0,payment_method:'cash',status:'paid',created_at:'2024-04-30 09:15'},
+    {id:2,patient_name:'سارة إبراهيم',doctor_name:'د. سارة علي',total:600,paid:300,discount:50,payment_method:'card',status:'partial',created_at:'2024-04-30 10:00'},
+    {id:3,patient_name:'محمود حسن',doctor_name:'د. محمود حسن',total:500,paid:0,discount:0,payment_method:'cash',status:'unpaid',created_at:'2024-04-30 11:30'},
+  ];
+  
+  const demoTreasury = [
+    {id:1,type:'income',category:'فواتير',amount:350,description:'فاتورة #1',created_at:'2024-04-30 09:15'},
+    {id:2,type:'income',category:'فواتير',amount:300,description:'دفعة فاتورة #2',created_at:'2024-04-30 10:05'},
+    {id:3,type:'expense',category:'مشتريات',amount:150,description:'مستلزمات طبية',created_at:'2024-04-30 12:00'},
+    {id:4,type:'income',category:'فواتير',amount:500,description:'فاتورة #4',created_at:'2024-04-29 14:30'},
+    {id:5,type:'expense',category:'كهرباء',amount:200,description:'فاتورة كهرباء',created_at:'2024-04-28 10:00'},
+  ];
+  
+  const demoWeekly = [
+    {day:'السبت',total:1200},{day:'الأحد',total:850},{day:'الاثنين',total:1450},
+    {day:'الثلاثاء',total:1100},{day:'الأربعاء',total:900},{day:'الخميس',total:1650},{day:'اليوم',total:650},
+  ];
+  
+  return {demoPatients,demoDoctors,demoAppts,demoInvoices,demoTreasury,demoWeekly};
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+function loadDashboard() {
+  const {demoAppts,demoInvoices,demoTreasury,demoWeekly,demoDoctors} = genDemoData();
+  
+  document.getElementById('stat-revenue').textContent = '650';
+  document.getElementById('stat-appts').textContent = demoAppts.length;
+  document.getElementById('stat-patients').textContent = '4';
+  document.getElementById('stat-pending-inv').textContent = '1';
+  document.getElementById('stat-monthly').textContent = '18,500';
+  document.getElementById('stat-treasury').textContent = '2,300';
+  
+  // Chart
+  const maxVal = Math.max(...demoWeekly.map(w => w.total));
+  const chartEl = document.getElementById('weeklyChart');
+  chartEl.innerHTML = demoWeekly.map(w => `
+    <div class="chart-bar-wrap">
+      <div class="chart-bar" style="height:${(w.total/maxVal)*100}%;"></div>
+      <div class="chart-label">${w.day}</div>
+    </div>
+  `).join('');
+  
+  // Doctor stats
+  const docStatsEl = document.getElementById('doctorStatsToday');
+  docStatsEl.innerHTML = demoDoctors.map(d => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f7fafc;border-radius:8px;">
+      <div>
+        <div style="font-weight:700;font-size:.88rem;">${d.name}</div>
+        <div style="font-size:.75rem;color:var(--text2);">${d.specialty}</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-weight:800;color:var(--primary);font-size:.95rem;">${(d.fee * 2).toLocaleString()} ج</div>
+        <div style="font-size:.72rem;color:var(--text2);">مريضان</div>
+      </div>
+    </div>
+  `).join('');
+  
+  // Recent appointments
+  const tbody = document.getElementById('recentAppointments');
+  tbody.innerHTML = demoAppts.map(a => `
+    <tr>
+      <td>#${a.id}</td>
+      <td><strong>${a.patient_name}</strong></td>
+      <td>${a.doctor_name}</td>
+      <td>${a.appointment_date}</td>
+      <td>${a.appointment_time}</td>
+      <td><span class="badge badge-${a.status}">${statusLabel(a.status)}</span></td>
+    </tr>
+  `).join('');
+}
+
+// ── Appointments ──────────────────────────────────────────────────────────────
+function loadAppointments() {
+  const {demoAppts} = genDemoData();
+  const tbody = document.getElementById('appointmentsTable');
+  tbody.innerHTML = demoAppts.map(a => `
+    <tr>
+      <td>#${a.id}</td>
+      <td><strong>${a.patient_name}</strong></td>
+      <td>${a.phone}</td>
+      <td>${a.doctor_name}</td>
+      <td><strong>${a.appointment_time}</strong></td>
+      <td><span class="badge badge-${a.status}">${statusLabel(a.status)}</span></td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-success btn-sm" onclick="changeStatus(${a.id},'completed')">✔</button>
+          <button class="btn btn-danger btn-sm" onclick="changeStatus(${a.id},'cancelled')">✕</button>
+          <button class="btn btn-accent btn-sm" onclick="openInvoiceForAppt(${a.id})">🧾</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function populateApptSelects() {
+  const {demoPatients,demoDoctors} = genDemoData();
+  const pSel = document.getElementById('appt-patient');
+  const dSel = document.getElementById('appt-doctor');
+  if (pSel) pSel.innerHTML = demoPatients.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  if (dSel) dSel.innerHTML = demoDoctors.map(d => `<option value="${d.id}">${d.name} — ${d.specialty}</option>`).join('');
+  
+  // Doctor filter
+  const df = document.getElementById('apptDoctorFilter');
+  if (df) df.innerHTML = '<option value="">كل الأطباء</option>' + demoDoctors.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+}
+
+function changeStatus(id, status) {
+  toast(`✅ تم تحديث الحالة إلى: ${statusLabel(status)}`);
+  loadAppointments();
+}
+
+function openInvoiceForAppt(id) {
+  openModal('addInvoiceModal');
+}
+
+function submitAppointment() {
+  const patient = document.getElementById('appt-patient').value;
+  const doctor = document.getElementById('appt-doctor').value;
+  const date = document.getElementById('appt-date').value;
+  const time = document.getElementById('appt-time').value;
+  if (!patient || !doctor || !date || !time) { toast('⚠️ يرجى ملء جميع البيانات', 'warn'); return; }
+  closeModal('addApptModal');
+  toast('✅ تم حجز الموعد بنجاح');
+  loadAppointments();
+}
+
+// ── Patients ──────────────────────────────────────────────────────────────────
+function loadPatients(q='') {
+  const {demoPatients} = genDemoData();
+  const filtered = q ? demoPatients.filter(p => p.name.includes(q) || p.phone.includes(q)) : demoPatients;
+  const tbody = document.getElementById('patientsTable');
+  tbody.innerHTML = filtered.map(p => `
+    <tr>
+      <td>#${p.id}</td>
+      <td><strong>${p.name}</strong></td>
+      <td dir="ltr">${p.phone}</td>
+      <td>${p.birth_date || '—'}</td>
+      <td>${p.address || '—'}</td>
+      <td style="font-size:.75rem;color:var(--text2);">${p.created_at.split(' ')[0]}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="toast('📋 عرض سجل المريض')">📋 السجل</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function searchPatients() {
+  loadPatients(document.getElementById('patientSearch').value);
+}
+
+function submitPatient() {
+  const name = document.getElementById('pt-name').value;
+  const phone = document.getElementById('pt-phone').value;
+  if (!name || !phone) { toast('⚠️ الاسم والتليفون مطلوبان', 'warn'); return; }
+  closeModal('addPatientModal');
+  toast('✅ تم إضافة المريض بنجاح');
+  loadPatients();
+}
+
+// ── Doctors ───────────────────────────────────────────────────────────────────
+function loadDoctors() {
+  const {demoDoctors} = genDemoData();
+  const grid = document.getElementById('doctorsGrid');
+  grid.innerHTML = demoDoctors.map(d => `
+    <div class="card" style="border-top:4px solid var(--accent);">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.2rem;">
+          ${d.name.split(' ')[1]?.[0] || 'د'}
+        </div>
+        <div>
+          <div style="font-weight:800;font-size:1rem;color:var(--primary);">${d.name}</div>
+          <div style="font-size:.8rem;color:var(--accent);font-weight:600;">${d.specialty}</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:.84rem;color:var(--text2);">
+        <div>📞 ${d.phone}</div>
+        <div>💰 رسوم الكشف: <strong style="color:var(--primary);">${d.fee} ج</strong></div>
+        <div>✈️ تيليجرام: ${d.telegram_chat_id || '<span style="color:#a0aec0;">غير مربوط</span>'}</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="btn btn-outline btn-sm" onclick="toast('📊 تقرير ${d.name}')">📊 تقرير</button>
+        <button class="btn btn-accent btn-sm" onclick="openModal('addApptModal')">📅 موعد</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function submitDoctor() {
+  const name = document.getElementById('dr-name').value;
+  if (!name) { toast('⚠️ اسم الطبيب مطلوب', 'warn'); return; }
+  closeModal('addDoctorModal');
+  toast('✅ تم إضافة الطبيب بنجاح');
+  loadDoctors();
+}
+
+// ── Invoices ──────────────────────────────────────────────────────────────────
+function loadInvoices(status='') {
+  const {demoInvoices} = genDemoData();
+  const filtered = status ? demoInvoices.filter(i => i.status === status) : demoInvoices;
+  const tbody = document.getElementById('invoicesTable');
+  tbody.innerHTML = filtered.map(inv => {
+    const remaining = inv.total - inv.paid - inv.discount;
+    return `
+    <tr>
+      <td>#${inv.id}</td>
+      <td><strong>${inv.patient_name}</strong></td>
+      <td>${inv.doctor_name}</td>
+      <td style="font-weight:700;">${inv.total.toLocaleString()} ج</td>
+      <td style="color:var(--accent2);font-weight:600;">${inv.paid.toLocaleString()} ج</td>
+      <td style="color:${remaining>0?'var(--danger)':'var(--accent2)'};font-weight:600;">${remaining.toLocaleString()} ج</td>
+      <td>${paymentLabel(inv.payment_method)}</td>
+      <td><span class="badge badge-${inv.status}">${invStatusLabel(inv.status)}</span></td>
+      <td style="font-size:.8rem;">${inv.created_at}</td>
+      <td>
+        ${remaining > 0 ? `<button class="btn btn-success btn-sm" onclick="payInvoice(${inv.id},${remaining})">💵 دفع</button>` : '✅'}
+      </td>
+    </tr>`;
+  }).join('');
+  
+  // Populate selects
+  const {demoPatients,demoDoctors} = genDemoData();
+  const ipSel = document.getElementById('inv-patient');
+  const idSel = document.getElementById('inv-doctor');
+  if (ipSel) ipSel.innerHTML = demoPatients.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  if (idSel) idSel.innerHTML = demoDoctors.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+}
+
+function filterInvoices(status, el) {
+  currentInvoiceFilter = status;
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  loadInvoices(status);
+}
+
+function loadServicesForInvoice() {
+  services = [
+    {id:1,name:'كشف',price:200},{id:2,name:'إعادة كشف',price:100},
+    {id:3,name:'أشعة',price:150},{id:4,name:'تحاليل',price:100},
+    {id:5,name:'حقنة',price:50},{id:6,name:'ضمادة',price:80},
+  ];
+  updateSvcSelects();
+}
+
+function updateSvcSelects() {
+  document.querySelectorAll('.svc-name').forEach(sel => {
+    const current = sel.value;
+    sel.innerHTML = '<option value="">اختر الخدمة...</option>' + 
+      services.map(s => `<option value="${s.id}" data-price="${s.price}">${s.name} — ${s.price} ج</option>`).join('');
+    if (current) sel.value = current;
+  });
+}
+
+function addSvcRow() {
+  const list = document.getElementById('servicesList');
+  const div = document.createElement('div');
+  div.className = 'service-row';
+  div.innerHTML = `
+    <select class="svc-name" onchange="updateSvcPrice(this)" style="flex:2;">
+      <option value="">اختر الخدمة...</option>
+      ${services.map(s => `<option value="${s.id}" data-price="${s.price}">${s.name} — ${s.price} ج</option>`).join('')}
+    </select>
+    <input type="number" class="svc-price" placeholder="السعر" style="flex:1;" oninput="calcInvoiceTotal()">
+    <input type="number" class="svc-qty" value="1" min="1" style="flex:.6;width:60px;" oninput="calcInvoiceTotal()">
+    <button class="btn btn-danger btn-sm" onclick="removeSvcRow(this)">✕</button>
+  `;
+  list.appendChild(div);
+}
+
+function removeSvcRow(btn) {
+  btn.closest('.service-row').remove();
+  calcInvoiceTotal();
+}
+
+function updateSvcPrice(sel) {
+  const opt = sel.options[sel.selectedIndex];
+  const price = opt.dataset.price || '';
+  const row = sel.closest('.service-row');
+  row.querySelector('.svc-price').value = price;
+  calcInvoiceTotal();
+}
+
+function calcInvoiceTotal() {
+  let total = 0;
+  document.querySelectorAll('.service-row').forEach(row => {
+    const price = parseFloat(row.querySelector('.svc-price').value) || 0;
+    const qty = parseFloat(row.querySelector('.svc-qty').value) || 1;
+    total += price * qty;
+  });
+  const discount = parseFloat(document.getElementById('inv-discount').value) || 0;
+  const net = total - discount;
+  document.getElementById('inv-total-display').textContent = net.toLocaleString() + ' ج';
+}
+
+function submitInvoice() {
+  closeModal('addInvoiceModal');
+  toast('✅ تم حفظ الفاتورة بنجاح');
+  loadInvoices(currentInvoiceFilter);
+}
+
+function payInvoice(id, remaining) {
+  toast(`💵 تم تسجيل دفعة ${remaining} ج للفاتورة #${id}`);
+  loadInvoices(currentInvoiceFilter);
+}
+
+// ── Treasury ──────────────────────────────────────────────────────────────────
+function loadTreasury() {
+  const {demoTreasury} = genDemoData();
+  const balance = demoTreasury.reduce((acc,t) => t.type==='income' ? acc+t.amount : acc-t.amount, 0);
+  document.getElementById('treasuryBalance').textContent = balance.toLocaleString() + ' ج';
+  
+  const tbody = document.getElementById('treasuryTable');
+  tbody.innerHTML = demoTreasury.map(t => `
+    <tr>
+      <td>#${t.id}</td>
+      <td><span class="badge badge-${t.type}">${t.type==='income'?'إيراد':'مصروف'}</span></td>
+      <td>${t.category}</td>
+      <td style="font-weight:700;color:${t.type==='income'?'var(--accent2)':'var(--danger)'};">
+        ${t.type==='income'?'+':'-'}${t.amount.toLocaleString()} ج
+      </td>
+      <td>${t.description}</td>
+      <td style="font-size:.8rem;color:var(--text2);">${t.created_at}</td>
+    </tr>
+  `).join('');
+}
+
+function openTreasury(type) {
+  treasuryType = type;
+  document.getElementById('treasuryModalTitle').textContent = type === 'income' ? '💰 إضافة إيراد' : '📤 تسجيل مصروف';
+  document.getElementById('treasurySubmitBtn').className = `btn ${type==='income'?'btn-success':'btn-danger'}`;
+  openModal('treasuryModal');
+}
+
+function submitTreasury() {
+  const amount = document.getElementById('tr-amount').value;
+  if (!amount) { toast('⚠️ المبلغ مطلوب', 'warn'); return; }
+  closeModal('treasuryModal');
+  toast(`✅ تم تسجيل ${treasuryType==='income'?'الإيراد':'المصروف'} بنجاح`);
+  loadTreasury();
+}
+
+// ── Reports ───────────────────────────────────────────────────────────────────
+function loadDailyReport() {
+  const date = document.getElementById('reportDate').value;
+  document.getElementById('reportContent').style.display = 'block';
+  document.getElementById('rpt-income').textContent = '2,150 ج';
+  document.getElementById('rpt-expense').textContent = '350 ج';
+  document.getElementById('rpt-net').textContent = '1,800 ج';
+  
+  const {demoDoctors} = genDemoData();
+  document.getElementById('reportDoctors').innerHTML = demoDoctors.map(d => `
+    <tr>
+      <td><strong>${d.name}</strong></td>
+      <td>${d.specialty}</td>
+      <td>${Math.floor(Math.random()*5)+1}</td>
+      <td style="font-weight:700;">${(d.fee * (Math.floor(Math.random()*4)+1)).toLocaleString()} ج</td>
+      <td style="color:var(--accent2);font-weight:700;">${(d.fee * (Math.floor(Math.random()*3)+1)).toLocaleString()} ج</td>
+    </tr>
+  `).join('');
+}
+
+// ── Telegram ──────────────────────────────────────────────────────────────────
+function loadDoctorsBotList() {
+  const {demoDoctors} = genDemoData();
+  document.getElementById('doctorsBotList').innerHTML = demoDoctors.map(d => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#f7fafc;border-radius:8px;">
+      <div>
+        <div style="font-weight:700;font-size:.9rem;">${d.name}</div>
+        <div style="font-size:.75rem;color:var(--text2);">${d.specialty}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="text" placeholder="Chat ID" value="${d.telegram_chat_id || ''}" 
+               style="padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:.8rem;width:120px;">
+        <button class="btn btn-accent btn-sm" onclick="toast('✅ تم حفظ Chat ID')">حفظ</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function saveBotConfig() {
+  const token = document.getElementById('botToken').value;
+  const chatId = document.getElementById('adminChatId').value;
+  if (!token || !chatId) { toast('⚠️ يرجى إدخال البيانات', 'warn'); return; }
+  toast('✅ تم حفظ إعدادات البوت');
+}
+
+function sendReport(type) {
+  const labels = {admin:'للأدمن',doctors:'للأطباء',all:'للكل'};
+  toast(`📤 جاري إرسال التقرير ${labels[type]}...`);
+  setTimeout(() => toast('✅ تم الإرسال بنجاح'), 1500);
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function statusLabel(s) {
+  return {pending:'⏳ منتظر',confirmed:'✅ مؤكد',completed:'✔️ منتهي',cancelled:'❌ ملغي'}[s] || s;
+}
+function invStatusLabel(s) {
+  return {paid:'✅ مسددة',partial:'⚠️ جزئية',unpaid:'❌ غير مسددة'}[s] || s;
+}
+function paymentLabel(p) {
+  return {cash:'💵 كاش',card:'💳 بطاقة',transfer:'🏦 تحويل',vodafone:'📱 فودافون'}[p] || p;
+}
+
+// ── Modal ─────────────────────────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'addApptModal') populateApptSelects();
+  if (id === 'addInvoiceModal') { loadInvoices(); updateSvcSelects(); calcInvoiceTotal(); }
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── Auto-login check ──────────────────────────────────────────────────────────
+window.addEventListener('keypress', e => { if (e.key === 'Enter') { 
+  if (document.getElementById('loginPage').style.display !== 'none') doLogin(); 
+}});
+</script>
+</body>
+</html>
