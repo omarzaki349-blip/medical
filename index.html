@@ -3,1395 +3,952 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>نظام المركز الطبي</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>المركز الطبي</title>
 <style>
-:root {
-  --primary: #0f4c75;
-  --primary-light: #1b6ca8;
-  --accent: #00b4d8;
-  --accent2: #06d6a0;
-  --danger: #ef233c;
-  --warn: #f4a261;
-  --bg: #f0f4f8;
-  --card: #ffffff;
-  --sidebar: #0a2540;
-  --text: #1a202c;
-  --text2: #4a5568;
-  --border: #e2e8f0;
-  --shadow: 0 2px 16px rgba(15,76,117,.10);
-  --radius: 14px;
-}
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;direction:rtl;background:#f8fafc;color:#0f172a;}
 
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'IBM Plex Sans Arabic',sans-serif; background:var(--bg); color:var(--text); direction:rtl; }
+/* LOGIN */
+.login-page{position:fixed;inset:0;background:#fff;display:flex;z-index:200;}
+.login-left{flex:1;background:linear-gradient(160deg,#0ea5e9,#0284c7);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;padding:40px;}
+.login-left h1{font-size:2rem;font-weight:900;margin-bottom:8px;}
+.login-left p{font-size:.95rem;opacity:.85;text-align:center;max-width:260px;line-height:1.7;}
+.login-right{width:380px;display:flex;align-items:center;justify-content:center;padding:40px;}
+.login-form{width:100%;}
+.login-form h2{font-size:1.4rem;font-weight:900;color:#0f172a;margin-bottom:6px;}
+.login-form .sub{font-size:.82rem;color:#94a3b8;margin-bottom:28px;}
+.lf{margin-bottom:14px;}
+.lf label{display:block;font-size:.78rem;font-weight:700;color:#475569;margin-bottom:5px;}
+.lf input{width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:'Cairo',sans-serif;font-size:.9rem;transition:.2s;direction:rtl;}
+.lf input:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,.1);}
+.lbtn{width:100%;padding:12px;background:#0ea5e9;color:#fff;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:.2s;}
+.lbtn:hover{background:#0284c7;}
+.lhint{text-align:center;font-size:.72rem;color:#cbd5e1;margin-top:14px;}
 
-/* ── Layout ── */
-.layout { display:flex; min-height:100vh; }
-.sidebar {
-  width:250px; background:var(--sidebar); color:#e2e8f0;
-  display:flex; flex-direction:column; position:fixed; height:100vh; z-index:100;
-  right:0; transition:.3s;
-}
-.main-content { margin-right:250px; flex:1; min-height:100vh; }
+/* APP */
+.app{display:none;height:100vh;min-height:600px;}
 
-/* ── Sidebar ── */
-.sidebar-logo {
-  padding:28px 20px 20px;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-.sidebar-logo h2 { font-size:1.1rem; font-weight:700; color:#fff; line-height:1.4; }
-.sidebar-logo p { font-size:.75rem; color:#7fa8c9; margin-top:3px; }
+/* SIDEBAR */
+.sb{width:220px;background:#fff;border-left:1px solid #f1f5f9;display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:50;}
+.sb-brand{padding:18px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:10px;}
+.sb-brand-ico{width:34px;height:34px;background:#0ea5e9;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.sb-brand h3{font-size:.9rem;font-weight:900;color:#0f172a;}
+.sb-brand p{font-size:.67rem;color:#94a3b8;}
+.sb-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;cursor:pointer;font-size:.83rem;color:#64748b;font-weight:600;transition:.15s;border:none;background:none;font-family:'Cairo',sans-serif;width:100%;text-align:right;}
+.ni:hover{background:#f0f9ff;color:#0ea5e9;}
+.ni.on{background:#e0f2fe;color:#0284c7;}
+.ni .ic{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+.sb-foot{padding:12px 14px;border-top:1px solid #f1f5f9;}
+.urow{display:flex;align-items:center;gap:8px;}
+.uav{width:32px;height:32px;border-radius:50%;background:#0ea5e9;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:.8rem;flex-shrink:0;}
+.uinfo p{font-size:.78rem;font-weight:700;}
+.uinfo span{font-size:.67rem;color:#94a3b8;}
+.logout-btn{background:none;border:none;font-size:.68rem;color:#cbd5e1;cursor:pointer;font-family:'Cairo',sans-serif;padding:0;font-weight:600;}
+.logout-btn:hover{color:#ef4444;}
 
-.nav-section { padding:12px 0; }
-.nav-section-title { font-size:.65rem; color:#4a6fa5; padding:8px 20px 4px; text-transform:uppercase; letter-spacing:1px; }
-.nav-item {
-  display:flex; align-items:center; gap:10px;
-  padding:11px 20px; cursor:pointer; transition:.2s;
-  color:#a0b4c8; font-size:.9rem; border-right:3px solid transparent;
-}
-.nav-item:hover { background:rgba(255,255,255,.06); color:#fff; }
-.nav-item.active { background:rgba(0,180,216,.12); color:var(--accent); border-right-color:var(--accent); }
-.nav-icon { font-size:1.1rem; width:22px; text-align:center; }
+/* MAIN */
+.main-area{margin-right:220px;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:#fff;border-bottom:1px solid #f1f5f9;padding:12px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
+.page-title{font-size:1rem;font-weight:900;color:#0f172a;}
+.date-chip{background:#f0f9ff;color:#0284c7;font-size:.73rem;font-weight:700;padding:4px 11px;border-radius:20px;}
+.content{flex:1;padding:20px 22px;overflow-y:auto;}
 
-.sidebar-user {
-  margin-top:auto; padding:16px 20px;
-  border-top:1px solid rgba(255,255,255,.08);
-  display:flex; align-items:center; gap:10px;
-}
-.user-avatar {
-  width:36px; height:36px; border-radius:50%; background:var(--primary-light);
-  display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:.85rem;
-}
-.user-info p { font-size:.85rem; color:#fff; font-weight:600; }
-.user-info span { font-size:.72rem; color:#7fa8c9; }
+/* PAGES */
+.pg{display:none;}.pg.on{display:block;}
 
-/* ── Top Bar ── */
-.topbar {
-  background:#fff; padding:14px 28px; display:flex; align-items:center;
-  justify-content:space-between; border-bottom:1px solid var(--border);
-  position:sticky; top:0; z-index:50;
-  box-shadow:0 2px 8px rgba(0,0,0,.04);
-}
-.topbar-title { font-size:1.15rem; font-weight:700; color:var(--primary); }
-.topbar-actions { display:flex; gap:10px; align-items:center; }
-.date-badge {
-  background:var(--bg); padding:6px 14px; border-radius:20px;
-  font-size:.82rem; color:var(--text2); font-weight:500;
-}
+/* BOOKING HERO */
+.booking-hero{background:linear-gradient(135deg,#0ea5e9,#0284c7);border-radius:14px;padding:20px;color:#fff;margin-bottom:18px;}
+.booking-hero h2{font-size:1.2rem;font-weight:900;margin-bottom:3px;}
+.booking-hero p{font-size:.8rem;opacity:.85;}
+.booking-form{background:#fff;border-radius:14px;border:1px solid #f1f5f9;padding:20px;box-shadow:0 4px 20px rgba(14,165,233,.06);}
+.booking-form h3{font-size:.95rem;font-weight:900;margin-bottom:16px;}
+.bfg{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.bfg .sp2{grid-column:span 2;}
+.fld{display:flex;flex-direction:column;gap:4px;}
+.fld label{font-size:.74rem;font-weight:700;color:#475569;}
+.fld input,.fld select{padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:'Cairo',sans-serif;font-size:.85rem;transition:.2s;direction:rtl;background:#fff;}
+.fld input:focus,.fld select:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,.1);}
+.book-btn{width:100%;padding:12px;background:#0ea5e9;color:#fff;border:none;border-radius:9px;font-family:'Cairo',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:8px;transition:.2s;}
+.book-btn:hover{background:#0284c7;}
 
-/* ── Pages ── */
-.page { display:none; padding:24px 28px; }
-.page.active { display:block; }
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px;}
+.scard{background:#fff;border-radius:12px;border:1px solid #f1f5f9;padding:13px;display:flex;align-items:center;gap:11px;}
+.scard-ico{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.ico-b{background:#e0f2fe;}.ico-g{background:#dcfce7;}.ico-o{background:#fef3c7;}.ico-r{background:#fee2e2;}
+.scard-v{font-size:1.25rem;font-weight:900;line-height:1;}
+.scard-l{font-size:.68rem;color:#94a3b8;font-weight:600;margin-top:2px;}
 
-/* ── Cards ── */
-.card {
-  background:var(--card); border-radius:var(--radius);
-  box-shadow:var(--shadow); padding:22px;
-  border:1px solid rgba(0,0,0,.04);
-}
-.card-title { font-size:1rem; font-weight:700; color:var(--primary); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+/* CARD */
+.card{background:#fff;border-radius:13px;border:1px solid #f1f5f9;padding:16px;margin-bottom:14px;}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.card-head h4{font-size:.88rem;font-weight:900;}
 
-/* ── Stats Grid ── */
-.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:24px; }
-.stat-card {
-  background:var(--card); border-radius:var(--radius);
-  padding:20px; border:1px solid rgba(0,0,0,.04);
-  box-shadow:var(--shadow); position:relative; overflow:hidden;
-  transition:.2s;
-}
-.stat-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(15,76,117,.14); }
-.stat-card::before {
-  content:''; position:absolute; top:0; right:0; width:4px; height:100%;
-}
-.stat-card.blue::before { background:var(--primary-light); }
-.stat-card.green::before { background:var(--accent2); }
-.stat-card.orange::before { background:var(--warn); }
-.stat-card.red::before { background:var(--danger); }
-.stat-card.cyan::before { background:var(--accent); }
-.stat-card.purple::before { background:#7c3aed; }
+/* TABLE */
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:.79rem;}
+th{padding:8px 10px;text-align:right;font-weight:700;color:#94a3b8;font-size:.69rem;border-bottom:1.5px solid #f8fafc;}
+td{padding:9px 10px;border-bottom:1px solid #f8fafc;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafbfc;}
 
-.stat-icon { font-size:2rem; margin-bottom:8px; }
-.stat-value { font-size:1.7rem; font-weight:800; color:var(--primary); line-height:1; }
-.stat-label { font-size:.78rem; color:var(--text2); margin-top:4px; font-weight:500; }
-.stat-sub { font-size:.72rem; color:#a0aec0; margin-top:2px; }
+/* BADGES */
+.sb2{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:.69rem;font-weight:700;}
+.sp{background:#fef9c3;color:#a16207;}
+.sc{background:#dcfce7;color:#15803d;}
+.sd{background:#e0f2fe;color:#0284c7;}
+.sx{background:#fee2e2;color:#dc2626;}
+.si2{background:#dcfce7;color:#15803d;}
+.sj{background:#fef9c3;color:#a16207;}
+.sk{background:#fee2e2;color:#dc2626;}
 
-/* ── Tables ── */
-.table-wrap { overflow-x:auto; }
-table { width:100%; border-collapse:collapse; font-size:.875rem; }
-th {
-  background:#f7fafc; padding:11px 14px; text-align:right;
-  font-weight:700; color:var(--text2); font-size:.78rem;
-  border-bottom:2px solid var(--border); white-space:nowrap;
-}
-td { padding:11px 14px; border-bottom:1px solid var(--border); color:var(--text); vertical-align:middle; }
-tr:last-child td { border-bottom:none; }
-tr:hover td { background:#f7fafc; }
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border:none;border-radius:7px;font-family:'Cairo',sans-serif;font-size:.77rem;font-weight:700;cursor:pointer;transition:.15s;}
+.btn-p{background:#0ea5e9;color:#fff;}.btn-p:hover{background:#0284c7;}
+.btn-s{background:#22c55e;color:#fff;}
+.btn-d{background:#ef4444;color:#fff;}
+.btn-w{background:#f59e0b;color:#fff;}
+.btn-g{background:#f8fafc;color:#475569;border:1px solid #e2e8f0;}.btn-g:hover{background:#e0f2fe;color:#0284c7;}
+.btn-sm{padding:4px 9px;font-size:.7rem;border-radius:6px;}
 
-/* ── Badges ── */
-.badge {
-  display:inline-block; padding:3px 10px; border-radius:20px;
-  font-size:.72rem; font-weight:700;
-}
-.badge-pending { background:#fff3cd; color:#856404; }
-.badge-confirmed { background:#d1ecf1; color:#0c5460; }
-.badge-completed { background:#d4edda; color:#155724; }
-.badge-cancelled { background:#f8d7da; color:#721c24; }
-.badge-paid { background:#d4edda; color:#155724; }
-.badge-partial { background:#fff3cd; color:#856404; }
-.badge-unpaid { background:#f8d7da; color:#721c24; }
-.badge-income { background:#d4edda; color:#155724; }
-.badge-expense { background:#f8d7da; color:#721c24; }
+/* QUEUE */
+.qlist{display:flex;flex-direction:column;gap:7px;}
+.qcard{background:#fff;border-radius:11px;border:1px solid #f1f5f9;padding:12px 14px;display:flex;align-items:center;gap:12px;}
+.qcard:hover{border-color:#bae6fd;}
+.qnum{width:32px;height:32px;border-radius:9px;background:#f0f9ff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.85rem;color:#0284c7;flex-shrink:0;}
+.qinfo{flex:1;}
+.qname{font-size:.88rem;font-weight:700;}
+.qsub{font-size:.73rem;color:#94a3b8;margin-top:1px;}
+.qtm{font-size:.85rem;font-weight:700;color:#0284c7;flex-shrink:0;}
 
-/* ── Forms ── */
-.form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
-.form-group { display:flex; flex-direction:column; gap:5px; }
-.form-group label { font-size:.8rem; font-weight:600; color:var(--text2); }
-.form-group input, .form-group select, .form-group textarea {
-  padding:9px 13px; border:1.5px solid var(--border); border-radius:8px;
-  font-family:inherit; font-size:.875rem; color:var(--text);
-  transition:.2s; direction:rtl;
-}
-.form-group input:focus, .form-group select:focus {
-  outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,180,216,.12);
-}
+/* SEARCH */
+.srch{display:flex;align-items:center;gap:7px;background:#fff;border:1.5px solid #e2e8f0;border-radius:9px;padding:7px 12px;margin-bottom:12px;}
+.srch input{border:none;outline:none;font-family:'Cairo',sans-serif;font-size:.83rem;flex:1;background:transparent;direction:rtl;}
 
-/* ── Buttons ── */
-.btn {
-  padding:9px 18px; border:none; border-radius:8px; cursor:pointer;
-  font-family:inherit; font-size:.875rem; font-weight:600;
-  transition:.2s; display:inline-flex; align-items:center; gap:6px;
-}
-.btn-primary { background:var(--primary); color:#fff; }
-.btn-primary:hover { background:var(--primary-light); }
-.btn-accent { background:var(--accent); color:#fff; }
-.btn-accent:hover { background:#009dc0; }
-.btn-success { background:var(--accent2); color:#fff; }
-.btn-success:hover { background:#05b884; }
-.btn-danger { background:var(--danger); color:#fff; }
-.btn-danger:hover { background:#c81e31; }
-.btn-warning { background:var(--warn); color:#fff; }
-.btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--text2); }
-.btn-outline:hover { border-color:var(--accent); color:var(--accent); }
-.btn-sm { padding:6px 12px; font-size:.78rem; border-radius:6px; }
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:12px;}
+.tab{padding:5px 13px;border-radius:7px;border:1.5px solid #e2e8f0;background:#fff;font-family:'Cairo',sans-serif;font-size:.76rem;font-weight:700;color:#94a3b8;cursor:pointer;transition:.15s;}
+.tab.on{background:#0ea5e9;border-color:#0ea5e9;color:#fff;}
 
-/* ── Modal ── */
-.modal-overlay {
-  display:none; position:fixed; inset:0; background:rgba(0,0,0,.5);
-  z-index:999; align-items:center; justify-content:center; padding:20px;
-}
-.modal-overlay.open { display:flex; }
-.modal {
-  background:#fff; border-radius:18px; width:100%; max-width:580px;
-  max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.3);
-  animation:slideUp .3s ease;
-}
-@keyframes slideUp { from { transform:translateY(30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-.modal-header {
-  padding:20px 24px 16px; border-bottom:1px solid var(--border);
-  display:flex; align-items:center; justify-content:space-between;
-}
-.modal-header h3 { font-size:1.1rem; font-weight:800; color:var(--primary); }
-.modal-close { font-size:1.4rem; cursor:pointer; color:var(--text2); background:none; border:none; line-height:1; }
-.modal-body { padding:20px 24px; }
-.modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; }
+/* INVOICE BUILDER */
+.svc-row{display:flex;align-items:center;gap:6px;padding:7px 9px;background:#f8fafc;border-radius:7px;margin-bottom:5px;}
+.svc-row select,.svc-row input{padding:5px 8px;border:1.5px solid #e2e8f0;border-radius:6px;font-family:'Cairo',sans-serif;font-size:.76rem;background:#fff;}
+.total-row{background:#0ea5e9;color:#fff;border-radius:9px;padding:11px 15px;display:flex;justify-content:space-between;align-items:center;margin-top:9px;font-weight:700;font-size:.88rem;}
 
-/* ── Invoice Builder ── */
-.services-list { display:flex; flex-direction:column; gap:8px; margin:12px 0; }
-.service-row {
-  display:flex; align-items:center; gap:10px;
-  background:#f7fafc; padding:10px 12px; border-radius:8px;
-}
-.service-row select, .service-row input { flex:1; padding:7px 10px; border:1.5px solid var(--border); border-radius:6px; font-family:inherit; font-size:.82rem; }
-.invoice-total {
-  background:linear-gradient(135deg,var(--primary),var(--primary-light));
-  color:#fff; border-radius:10px; padding:14px 18px; margin-top:12px;
-  display:flex; justify-content:space-between; align-items:center; font-weight:700;
-}
+/* TREASURY */
+.tr-head{background:linear-gradient(135deg,#0284c7,#0ea5e9);border-radius:13px;padding:16px;margin-bottom:14px;color:#fff;display:flex;justify-content:space-between;align-items:center;}
+.tr-bal{font-size:1.9rem;font-weight:900;}
+.tr-lbl{font-size:.73rem;opacity:.75;margin-bottom:3px;}
 
-/* ── Calendar / Schedule ── */
-.schedule-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
-.doctor-schedule { background:var(--card); border-radius:12px; padding:16px; border:1px solid var(--border); }
-.doctor-schedule h4 { font-size:.9rem; font-weight:700; color:var(--primary); margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--accent); }
-.appt-slot {
-  display:flex; align-items:center; gap:10px;
-  padding:8px 10px; border-radius:8px; margin-bottom:6px;
-  background:#f7fafc; font-size:.83rem;
-}
-.appt-slot.empty { color:#a0aec0; font-style:italic; }
-.time-badge { background:var(--primary); color:#fff; padding:2px 8px; border-radius:4px; font-size:.75rem; font-weight:700; }
+/* DOCTOR CARD */
+.dr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:11px;}
+.dr-card{background:#fff;border-radius:13px;border:1px solid #f1f5f9;padding:15px;border-top:3px solid #0ea5e9;}
+.dr-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:1.05rem;margin-bottom:9px;}
 
-/* ── Dashboard Chart ── */
-.chart-bars { display:flex; align-items:flex-end; gap:8px; height:120px; padding:10px 0; }
-.chart-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; }
-.chart-bar {
-  width:100%; background:linear-gradient(180deg,var(--accent),var(--primary-light));
-  border-radius:4px 4px 0 0; min-height:4px; transition:.8s ease;
-}
-.chart-label { font-size:.65rem; color:var(--text2); }
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:99;padding:16px;}
+.overlay.open{display:flex;}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 70px rgba(0,0,0,.2);}
+.mh{padding:14px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;}
+.mh h3{font-size:.92rem;font-weight:900;color:#0f172a;}
+.mx{background:none;border:none;font-size:1.05rem;cursor:pointer;color:#94a3b8;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.mx:hover{background:#f1f5f9;color:#ef4444;}
+.mb{padding:16px 18px;}
+.mf{padding:11px 18px;border-top:1px solid #f1f5f9;display:flex;gap:7px;justify-content:flex-end;}
+.fg2{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;}
+.fg2 .sp2{grid-column:span 2;}
+.fld2{display:flex;flex-direction:column;gap:4px;}
+.fld2 label{font-size:.72rem;font-weight:700;color:#475569;}
+.fld2 input,.fld2 select{padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:7px;font-family:'Cairo',sans-serif;font-size:.83rem;transition:.2s;direction:rtl;background:#fff;}
+.fld2 input:focus,.fld2 select:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,.1);}
 
-/* ── Treasury ── */
-.treasury-header {
-  background:linear-gradient(135deg,#0a2540,#0f4c75);
-  color:#fff; border-radius:14px; padding:24px; margin-bottom:20px;
-  display:flex; justify-content:space-between; align-items:center;
-}
-.balance-amount { font-size:2.2rem; font-weight:800; }
+/* TELEGRAM */
+.bot-card{background:#f0f9ff;border-radius:10px;padding:12px;border-right:3px solid #0ea5e9;}
+.bot-card.g{background:#f0fdf4;border-right-color:#22c55e;}
+.bot-card.o{background:#fffbeb;border-right-color:#f59e0b;}
 
-/* ── Tabs ── */
-.tabs { display:flex; gap:4px; background:#f0f4f8; padding:4px; border-radius:10px; margin-bottom:20px; width:fit-content; }
-.tab { padding:8px 18px; border-radius:7px; cursor:pointer; font-size:.85rem; font-weight:600; color:var(--text2); transition:.2s; border:none; background:none; font-family:inherit; }
-.tab.active { background:#fff; color:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,.08); }
+/* CONFIRM DIALOG */
+.confirm-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;z-index:200;}
+.confirm-overlay.open{display:flex;}
+.confirm-box{background:#fff;border-radius:14px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.confirm-box h4{font-size:.95rem;font-weight:900;color:#0f172a;margin-bottom:6px;}
+.confirm-box p{font-size:.8rem;color:#64748b;margin-bottom:18px;}
+.confirm-btns{display:flex;gap:8px;justify-content:center;}
 
-/* ── Toast ── */
-.toast {
-  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
-  background:#1a202c; color:#fff; padding:12px 24px; border-radius:30px;
-  font-size:.875rem; font-weight:600; z-index:9999;
-  box-shadow:0 8px 24px rgba(0,0,0,.2); opacity:0; transition:.3s;
-  pointer-events:none; white-space:nowrap;
-}
-.toast.show { opacity:1; }
-
-/* ── Login ── */
-.login-page {
-  min-height:100vh; display:flex; align-items:center; justify-content:center;
-  background:linear-gradient(135deg,#0a2540 0%,#0f4c75 50%,#1b6ca8 100%);
-}
-.login-card {
-  background:#fff; border-radius:20px; padding:40px; width:100%; max-width:400px;
-  box-shadow:0 20px 60px rgba(0,0,0,.3);
-}
-.login-logo { text-align:center; margin-bottom:28px; }
-.login-logo h1 { color:var(--primary); font-size:1.6rem; font-weight:800; }
-.login-logo p { color:var(--text2); font-size:.85rem; margin-top:4px; }
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width:6px; height:6px; }
-::-webkit-scrollbar-track { background:#f1f5f9; }
-::-webkit-scrollbar-thumb { background:#cbd5e0; border-radius:3px; }
-
-/* ── Responsive ── */
-@media (max-width:768px) {
-  .sidebar { width:200px; }
-  .main-content { margin-right:200px; }
-  .stats-grid { grid-template-columns:repeat(2,1fr); }
-  .page { padding:16px; }
-}
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:9px 20px;border-radius:30px;font-size:.78rem;font-weight:700;z-index:999;opacity:0;transition:.25s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;}
 </style>
 </head>
 <body>
 
-<!-- LOGIN PAGE -->
+<!-- LOGIN -->
 <div class="login-page" id="loginPage">
-  <div class="login-card">
-    <div class="login-logo">
-      <div style="font-size:3rem;margin-bottom:8px;">🏥</div>
-      <h1>المركز الطبي</h1>
-      <p>نظام إدارة المركز الطبي المتكامل</p>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div class="form-group">
-        <label>اسم المستخدم</label>
-        <input type="text" id="loginUser" placeholder="admin" value="admin">
-      </div>
-      <div class="form-group">
-        <label>كلمة المرور</label>
-        <input type="password" id="loginPass" placeholder="••••••••" value="admin123">
-      </div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;" onclick="doLogin()">
-        🔐 دخول
-      </button>
-      <p style="text-align:center;font-size:.75rem;color:#a0aec0;">
-        admin / admin123 — للمدير &nbsp;|&nbsp; reception / rec123 — للاستقبال
-      </p>
+  <div class="login-left">
+    <div style="font-size:3.5rem;margin-bottom:14px;">🏥</div>
+    <h1>المركز الطبي</h1>
+    <p>نظام إدارة متكامل للعيادات والمراكز الطبية</p>
+  </div>
+  <div class="login-right">
+    <div class="login-form">
+      <h2>أهلاً بك 👋</h2>
+      <p class="sub">سجّل دخولك للمتابعة</p>
+      <div class="lf"><label>اسم المستخدم</label><input id="lu" value="admin"></div>
+      <div class="lf"><label>كلمة المرور</label><input type="password" id="lp" value="admin123"></div>
+      <button class="lbtn" onclick="doLogin()">دخول ←</button>
+      <p class="lhint">admin / admin123 &nbsp;|&nbsp; reception / rec123</p>
     </div>
   </div>
 </div>
 
-<!-- MAIN SYSTEM -->
-<div class="layout" id="mainApp" style="display:none;">
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-logo">
-      <h2>🏥 المركز الطبي</h2>
-      <p>نظام الإدارة المتكامل</p>
+<!-- APP -->
+<div class="app" id="appShell">
+  <div class="sb">
+    <div class="sb-brand">
+      <div class="sb-brand-ico">🏥</div>
+      <div><h3>المركز الطبي</h3><p>إدارة متكاملة</p></div>
     </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">الرئيسية</div>
-      <div class="nav-item active" onclick="showPage('dashboard',this)">
-        <span class="nav-icon">📊</span> لوحة التحكم
-      </div>
+    <div class="sb-nav">
+      <button class="ni on" onclick="go('booking',this)"><span class="ic">📅</span> حجز موعد</button>
+      <button class="ni" onclick="go('queue',this)"><span class="ic">🔢</span> قائمة الانتظار</button>
+      <button class="ni" onclick="go('patients',this)"><span class="ic">👤</span> المرضى</button>
+      <button class="ni" onclick="go('doctors',this)"><span class="ic">👨‍⚕️</span> الأطباء</button>
+      <button class="ni" onclick="go('invoices',this)"><span class="ic">🧾</span> الفواتير</button>
+      <button class="ni" onclick="go('treasury',this)"><span class="ic">💰</span> الخزنة</button>
+      <button class="ni" onclick="go('reports',this)"><span class="ic">📊</span> التقارير</button>
+      <button class="ni" onclick="go('telegram',this)"><span class="ic">✈️</span> التيليجرام</button>
     </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">المرضى والحجوزات</div>
-      <div class="nav-item" onclick="showPage('appointments',this)">
-        <span class="nav-icon">📅</span> الحجوزات
-      </div>
-      <div class="nav-item" onclick="showPage('patients',this)">
-        <span class="nav-icon">🧑‍🤝‍🧑</span> المرضى
-      </div>
-      <div class="nav-item" onclick="showPage('doctors',this)">
-        <span class="nav-icon">👨‍⚕️</span> الأطباء
-      </div>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">المالية</div>
-      <div class="nav-item" onclick="showPage('invoices',this)">
-        <span class="nav-icon">🧾</span> الفواتير
-      </div>
-      <div class="nav-item" onclick="showPage('treasury',this)">
-        <span class="nav-icon">💰</span> الخزنة
-      </div>
-      <div class="nav-item" onclick="showPage('reports',this)">
-        <span class="nav-icon">📈</span> التقارير
-      </div>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">بوت تيليجرام</div>
-      <div class="nav-item" onclick="showPage('telegram',this)">
-        <span class="nav-icon">✈️</span> إعداد البوت
-      </div>
-    </div>
-
-    <div class="sidebar-user">
-      <div class="user-avatar" id="userAvatar">م</div>
-      <div class="user-info">
-        <p id="userName">المدير</p>
-        <span id="userRole">مدير النظام</span>
+    <div class="sb-foot">
+      <div class="urow">
+        <div class="uav" id="uav">م</div>
+        <div class="uinfo">
+          <p id="uname">المدير</p>
+          <span id="urole">مدير النظام</span><br>
+          <button class="logout-btn" onclick="doLogout()">تسجيل خروج</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Main Content -->
-  <div class="main-content">
-
-    <!-- Topbar -->
+  <div class="main-area">
     <div class="topbar">
-      <div class="topbar-title" id="pageTitle">لوحة التحكم</div>
-      <div class="topbar-actions">
-        <div class="date-badge" id="currentDate"></div>
-        <button class="btn btn-outline btn-sm" onclick="doLogout()">🚪 خروج</button>
-      </div>
+      <div class="page-title" id="pgTitle">حجز موعد</div>
+      <div class="date-chip" id="dateNow"></div>
     </div>
+    <div class="content">
 
-    <!-- ── DASHBOARD ── -->
-    <div class="page active" id="page-dashboard">
-      <div class="stats-grid">
-        <div class="stat-card blue">
-          <div class="stat-icon">💰</div>
-          <div class="stat-value" id="stat-revenue">—</div>
-          <div class="stat-label">إيرادات اليوم</div>
-          <div class="stat-sub">جنيه مصري</div>
+      <!-- BOOKING -->
+      <div class="pg on" id="pg-booking">
+        <div class="booking-hero">
+          <h2>📅 حجز موعد جديد</h2>
+          <p>اختر الطبيب والوقت المناسب واحجز بسرعة</p>
         </div>
-        <div class="stat-card green">
-          <div class="stat-icon">📅</div>
-          <div class="stat-value" id="stat-appts">—</div>
-          <div class="stat-label">حجوزات اليوم</div>
+        <div class="booking-form">
+          <h3>📋 بيانات الحجز</h3>
+          <div class="bfg">
+            <div class="fld sp2"><label>المريض *</label><select id="bkPt"><option value="">اختر المريض...</option></select></div>
+            <div class="fld"><label>الطبيب *</label><select id="bkDr" onchange="loadTimes()"><option value="">اختر الطبيب...</option></select></div>
+            <div class="fld"><label>التاريخ *</label><input type="date" id="bkDt" onchange="loadTimes()"></div>
+            <div class="fld"><label>الوقت المتاح *</label><select id="bkTm"></select></div>
+            <div class="fld"><label>ملاحظات</label><input type="text" id="bkNote" placeholder="اختياري"></div>
+          </div>
+          <p style="font-size:.72rem;color:#94a3b8;margin-top:10px;">مريض جديد؟ <span style="color:#0ea5e9;cursor:pointer;font-weight:700;" onclick="openM('mPt')">سجّله أولاً ←</span></p>
+          <button class="book-btn" onclick="submitBooking()">📅 تأكيد الحجز</button>
         </div>
-        <div class="stat-card cyan">
-          <div class="stat-icon">🧑‍🤝‍🧑</div>
-          <div class="stat-value" id="stat-patients">—</div>
-          <div class="stat-label">مرضى اليوم</div>
-        </div>
-        <div class="stat-card orange">
-          <div class="stat-icon">🧾</div>
-          <div class="stat-value" id="stat-pending-inv">—</div>
-          <div class="stat-label">فواتير غير مسددة</div>
-        </div>
-        <div class="stat-card purple">
-          <div class="stat-icon">📊</div>
-          <div class="stat-value" id="stat-monthly">—</div>
-          <div class="stat-label">إيرادات الشهر</div>
-        </div>
-        <div class="stat-card green">
-          <div class="stat-icon">🏦</div>
-          <div class="stat-value" id="stat-treasury">—</div>
-          <div class="stat-label">رصيد الخزنة</div>
+        <div class="stats" style="margin-top:20px;">
+          <div class="scard"><div class="scard-ico ico-b">📅</div><div><div class="scard-v" id="s-appts">0</div><div class="scard-l">حجوزات اليوم</div></div></div>
+          <div class="scard"><div class="scard-ico ico-g">💰</div><div><div class="scard-v" id="s-rev">0</div><div class="scard-l">إيرادات اليوم (ج)</div></div></div>
+          <div class="scard"><div class="scard-ico ico-o">🧾</div><div><div class="scard-v" id="s-unp">0</div><div class="scard-l">فواتير غير مسددة</div></div></div>
+          <div class="scard"><div class="scard-ico ico-r">🏦</div><div><div class="scard-v" id="s-bal">0</div><div class="scard-l">رصيد الخزنة (ج)</div></div></div>
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px;">
-        <!-- Weekly Chart -->
+      <!-- QUEUE -->
+      <div class="pg" id="pg-queue">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="display:flex;gap:8px;">
+            <input type="date" id="qDate" style="padding:7px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:'Cairo',sans-serif;font-size:.8rem;">
+            <select id="qDr" style="padding:7px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:'Cairo',sans-serif;font-size:.8rem;" onchange="renderQueue()"></select>
+          </div>
+          <button class="btn btn-p btn-sm" onclick="go('booking',document.querySelectorAll('.ni')[0])">+ حجز جديد</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <span style="font-size:.9rem;font-weight:900;">قائمة الانتظار</span>
+          <span style="background:#e0f2fe;color:#0284c7;font-size:.71rem;font-weight:700;padding:3px 10px;border-radius:20px;" id="qCount">0 حجز</span>
+        </div>
+        <div class="qlist" id="queueList"></div>
+      </div>
+
+      <!-- PATIENTS -->
+      <div class="pg" id="pg-patients">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="srch" style="flex:1;max-width:280px;margin-bottom:0;"><span>🔍</span><input id="ptSrch" placeholder="ابحث..." oninput="renderPts()"></div>
+          <button class="btn btn-p btn-sm" onclick="openM('mPt')">+ مريض جديد</button>
+        </div>
+        <div class="card"><div class="tw"><table>
+          <thead><tr><th>#</th><th>الاسم</th><th>التليفون</th><th>تاريخ الميلاد</th><th>العنوان</th><th>إجراء</th></tr></thead>
+          <tbody id="ptTbl"></tbody>
+        </table></div></div>
+      </div>
+
+      <!-- DOCTORS -->
+      <div class="pg" id="pg-doctors">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+          <button class="btn btn-p btn-sm" onclick="openM('mDr')">+ طبيب جديد</button>
+        </div>
+        <div class="dr-grid" id="drGrid"></div>
+      </div>
+
+      <!-- INVOICES -->
+      <div class="pg" id="pg-invoices">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="tabs" style="margin-bottom:0;">
+            <button class="tab on" onclick="filtInv('',this)">الكل</button>
+            <button class="tab" onclick="filtInv('unp',this)">غير مسددة</button>
+            <button class="tab" onclick="filtInv('part',this)">جزئية</button>
+            <button class="tab" onclick="filtInv('paid',this)">مسددة</button>
+          </div>
+          <button class="btn btn-p btn-sm" onclick="openM('mInv')">+ فاتورة جديدة</button>
+        </div>
+        <div class="card"><div class="tw"><table>
+          <thead><tr><th>#</th><th>المريض</th><th>الطبيب</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الدفع</th><th>الحالة</th><th>إجراء</th></tr></thead>
+          <tbody id="invTbl"></tbody>
+        </table></div></div>
+      </div>
+
+      <!-- TREASURY -->
+      <div class="pg" id="pg-treasury">
+        <div class="tr-head">
+          <div><div class="tr-lbl">رصيد الخزنة</div><div class="tr-bal" id="trBal">0 ج</div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-sm" style="background:#fff;color:#0284c7;font-family:'Cairo',sans-serif;font-weight:700;" onclick="openTr('income')">+ إيراد</button>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.35);font-family:'Cairo',sans-serif;font-weight:700;" onclick="openTr('expense')">− مصروف</button>
+          </div>
+        </div>
         <div class="card">
-          <div class="card-title">📈 إيرادات آخر 7 أيام</div>
-          <div class="chart-bars" id="weeklyChart"></div>
+          <div class="card-head"><h4>📋 سجل المعاملات</h4></div>
+          <div class="tw"><table>
+            <thead><tr><th>#</th><th>النوع</th><th>الفئة</th><th>المبلغ</th><th>البيان</th><th>الوقت</th><th>إجراء</th></tr></thead>
+            <tbody id="trTbl"></tbody>
+          </table></div>
         </div>
-        <!-- Doctor Stats -->
+      </div>
+
+      <!-- REPORTS -->
+      <div class="pg" id="pg-reports">
         <div class="card">
-          <div class="card-title">👨‍⚕️ الأطباء اليوم</div>
-          <div id="doctorStatsToday" style="display:flex;flex-direction:column;gap:10px;"></div>
-        </div>
-      </div>
-
-      <!-- Recent Appointments -->
-      <div class="card">
-        <div class="card-title">📋 آخر الحجوزات
-          <button class="btn btn-accent btn-sm" style="margin-right:auto;" onclick="showPage('appointments',null)">عرض الكل</button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>#</th><th>المريض</th><th>الطبيب</th><th>التاريخ</th><th>الوقت</th><th>الحالة</th></tr></thead>
-            <tbody id="recentAppointments"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── APPOINTMENTS ── -->
-    <div class="page" id="page-appointments">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <div style="display:flex;gap:10px;align-items:center;">
-          <input type="date" id="apptDateFilter" class="form-group input" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
-          <select id="apptDoctorFilter" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;" onchange="loadAppointments()">
-            <option value="">كل الأطباء</option>
-          </select>
-          <button class="btn btn-outline btn-sm" onclick="loadAppointments()">🔍 بحث</button>
-        </div>
-        <button class="btn btn-primary" onclick="openModal('addApptModal')">+ حجز جديد</button>
-      </div>
-
-      <!-- Schedule view -->
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title">📋 جدول اليوم</div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>#</th><th>المريض</th><th>تليفون</th><th>الطبيب</th><th>الوقت</th><th>الحالة</th><th>إجراء</th></tr></thead>
-            <tbody id="appointmentsTable"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── PATIENTS ── -->
-    <div class="page" id="page-patients">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <div style="display:flex;gap:10px;">
-          <input type="text" id="patientSearch" placeholder="🔍 ابحث بالاسم أو التليفون..." style="padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;min-width:280px;" oninput="searchPatients()">
-        </div>
-        <button class="btn btn-primary" onclick="openModal('addPatientModal')">+ مريض جديد</button>
-      </div>
-      <div class="card">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>#</th><th>الاسم</th><th>التليفون</th><th>تاريخ الميلاد</th><th>العنوان</th><th>تسجيل</th><th>إجراء</th></tr></thead>
-            <tbody id="patientsTable"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── DOCTORS ── -->
-    <div class="page" id="page-doctors">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <div></div>
-        <button class="btn btn-primary" onclick="openModal('addDoctorModal')">+ طبيب جديد</button>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;" id="doctorsGrid"></div>
-    </div>
-
-    <!-- ── INVOICES ── -->
-    <div class="page" id="page-invoices">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <div class="tabs">
-          <button class="tab active" onclick="filterInvoices('',this)">الكل</button>
-          <button class="tab" onclick="filterInvoices('unpaid',this)">غير مسددة</button>
-          <button class="tab" onclick="filterInvoices('partial',this)">جزئية</button>
-          <button class="tab" onclick="filterInvoices('paid',this)">مسددة</button>
-        </div>
-        <button class="btn btn-primary" onclick="openModal('addInvoiceModal')">+ فاتورة جديدة</button>
-      </div>
-      <div class="card">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>#</th><th>المريض</th><th>الطبيب</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>طريقة الدفع</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th></tr></thead>
-            <tbody id="invoicesTable"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── TREASURY ── -->
-    <div class="page" id="page-treasury">
-      <div class="treasury-header">
-        <div>
-          <div style="font-size:.85rem;opacity:.7;margin-bottom:4px;">رصيد الخزنة الحالي</div>
-          <div class="balance-amount" id="treasuryBalance">—</div>
-          <div style="font-size:.8rem;opacity:.6;margin-top:2px;">جنيه مصري</div>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <button class="btn btn-success" onclick="openTreasury('income')">+ إيراد</button>
-          <button class="btn btn-danger" onclick="openTreasury('expense')">− مصروف</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">📋 سجل المعاملات</div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>#</th><th>النوع</th><th>الفئة</th><th>المبلغ</th><th>البيان</th><th>التاريخ</th></tr></thead>
-            <tbody id="treasuryTable"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── REPORTS ── -->
-    <div class="page" id="page-reports">
-      <div class="card" style="margin-bottom:20px;">
-        <div class="card-title">📊 التقرير اليومي</div>
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;">
-          <input type="date" id="reportDate" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
-          <button class="btn btn-primary" onclick="loadDailyReport()">عرض التقرير</button>
-        </div>
-        <div id="reportContent" style="display:none;">
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
-            <div class="stat-card green"><div class="stat-icon">💰</div><div class="stat-value" id="rpt-income">0</div><div class="stat-label">الإيرادات</div></div>
-            <div class="stat-card red"><div class="stat-icon">📤</div><div class="stat-value" id="rpt-expense">0</div><div class="stat-label">المصروفات</div></div>
-            <div class="stat-card blue"><div class="stat-icon">📊</div><div class="stat-value" id="rpt-net">0</div><div class="stat-label">الصافي</div></div>
+          <div class="card-head"><h4>📊 التقرير اليومي</h4></div>
+          <div style="display:flex;gap:9px;align-items:center;margin-bottom:16px;">
+            <input type="date" id="rpDate" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:'Cairo',sans-serif;font-size:.83rem;">
+            <button class="btn btn-p btn-sm" onclick="showReport()">عرض</button>
           </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>الطبيب</th><th>التخصص</th><th>الحجوزات</th><th>الإيرادات</th><th>المحصّل</th></tr></thead>
-              <tbody id="reportDoctors"></tbody>
-            </table>
+          <div id="rpBody" style="display:none;">
+            <div class="stats" style="margin-bottom:14px;">
+              <div class="scard"><div class="scard-ico ico-g">💰</div><div><div class="scard-v" id="rInc">0</div><div class="scard-l">إيرادات (ج)</div></div></div>
+              <div class="scard"><div class="scard-ico ico-r">📤</div><div><div class="scard-v" id="rExp">0</div><div class="scard-l">مصروفات (ج)</div></div></div>
+              <div class="scard"><div class="scard-ico ico-b">📊</div><div><div class="scard-v" id="rNet">0</div><div class="scard-l">الصافي (ج)</div></div></div>
+              <div class="scard"><div class="scard-ico ico-o">📅</div><div><div class="scard-v" id="rCnt">0</div><div class="scard-l">حجوزات</div></div></div>
+            </div>
+            <div class="tw"><table>
+              <thead><tr><th>الطبيب</th><th>التخصص</th><th>الحجوزات</th><th>الإيرادات (ج)</th><th>المحصّل (ج)</th></tr></thead>
+              <tbody id="rpDrs"></tbody>
+            </table></div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ── TELEGRAM BOT ── -->
-    <div class="page" id="page-telegram">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <!-- TELEGRAM -->
+      <div class="pg" id="pg-telegram">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div class="card">
+            <div class="card-head"><h4>✈️ إعداد البوت</h4></div>
+            <div class="fld2" style="margin-bottom:9px;"><label>Bot Token</label><input placeholder="1234567890:AAAA..."></div>
+            <div class="fld2" style="margin-bottom:12px;"><label>Admin Chat ID</label><input placeholder="123456789"></div>
+            <button class="btn btn-p btn-sm" onclick="toast('✅ تم الحفظ')">💾 حفظ</button>
+            <div style="margin-top:12px;padding-top:11px;border-top:1px solid #f1f5f9;">
+              <p style="font-size:.79rem;font-weight:700;margin-bottom:7px;">📤 إرسال يدوي</p>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <button class="btn btn-g btn-sm" onclick="toast('📊 تم الإرسال للأدمن')">تقرير الأدمن الآن</button>
+                <button class="btn btn-g btn-sm" onclick="toast('👨‍⚕️ تم الإرسال للأطباء')">تقارير الأطباء الآن</button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h4>🔗 ربط الأطباء</h4></div>
+            <div id="drBotList"></div>
+          </div>
+        </div>
         <div class="card">
-          <div class="card-title">✈️ إعداد البوت</div>
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <div class="form-group">
-              <label>Bot Token</label>
-              <input type="text" id="botToken" placeholder="1234567890:AAAA...">
-            </div>
-            <div class="form-group">
-              <label>Chat ID الأدمن</label>
-              <input type="text" id="adminChatId" placeholder="123456789">
-            </div>
-            <button class="btn btn-primary" onclick="saveBotConfig()">💾 حفظ الإعدادات</button>
-          </div>
-
-          <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
-            <div class="card-title">📤 إرسال تقرير يدوي</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <button class="btn btn-accent" onclick="sendReport('admin')">📊 تقرير شامل للأدمن</button>
-              <button class="btn btn-outline" onclick="sendReport('doctors')">👨‍⚕️ تقارير الأطباء</button>
-              <button class="btn btn-outline" onclick="sendReport('all')">📬 إرسال للكل</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">🔗 ربط الأطباء بالبوت</div>
-          <div id="doctorsBotList" style="display:flex;flex-direction:column;gap:10px;"></div>
-        </div>
-
-        <div class="card" style="grid-column:span 2;">
-          <div class="card-title">📋 وظائف البوت</div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-            <div style="background:#f0f9ff;border-radius:10px;padding:14px;border-right:3px solid var(--accent);">
-              <div style="font-size:1.5rem;margin-bottom:6px;">🧑‍💼</div>
-              <div style="font-weight:700;font-size:.9rem;color:var(--primary);">المريض</div>
-              <ul style="font-size:.8rem;color:var(--text2);margin-top:6px;padding-right:16px;line-height:2;">
-                <li>حجز موعد جديد</li>
-                <li>عرض مواعيده</li>
-                <li>التواصل مع المركز</li>
-              </ul>
-            </div>
-            <div style="background:#f0fdf4;border-radius:10px;padding:14px;border-right:3px solid var(--accent2);">
-              <div style="font-size:1.5rem;margin-bottom:6px;">👨‍⚕️</div>
-              <div style="font-weight:700;font-size:.9rem;color:var(--primary);">الطبيب</div>
-              <ul style="font-size:.8rem;color:var(--text2);margin-top:6px;padding-right:16px;line-height:2;">
-                <li>تقريره اليومي تلقائي</li>
-                <li>عدد مرضاه</li>
-                <li>إيراداته المحصّلة</li>
-              </ul>
-            </div>
-            <div style="background:#fff7ed;border-radius:10px;padding:14px;border-right:3px solid var(--warn);">
-              <div style="font-size:1.5rem;margin-bottom:6px;">👑</div>
-              <div style="font-weight:700;font-size:.9rem;color:var(--primary);">الأدمن</div>
-              <ul style="font-size:.8rem;color:var(--text2);margin-top:6px;padding-right:16px;line-height:2;">
-                <li>تقرير الإيرادات اليومي</li>
-                <li>حساب كل طبيب</li>
-                <li>إرسال تلقائي 10 مساءً</li>
-              </ul>
-            </div>
+          <div class="card-head"><h4>📋 وظائف البوت</h4></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;">
+            <div class="bot-card"><p style="font-size:.81rem;font-weight:900;margin-bottom:5px;">🧑‍💼 المريض</p><ul style="font-size:.73rem;color:#64748b;padding-right:13px;line-height:2;"><li>حجز موعد</li><li>مواعيده</li><li>التواصل</li></ul></div>
+            <div class="bot-card g"><p style="font-size:.81rem;font-weight:900;margin-bottom:5px;">👨‍⚕️ الطبيب</p><ul style="font-size:.73rem;color:#64748b;padding-right:13px;line-height:2;"><li>تقرير يومي</li><li>قائمة المرضى</li><li>الإيرادات</li></ul></div>
+            <div class="bot-card o"><p style="font-size:.81rem;font-weight:900;margin-bottom:5px;">👑 الأدمن</p><ul style="font-size:.73rem;color:#64748b;padding-right:13px;line-height:2;"><li>تقرير 10م تلقائي</li><li>حساب كل طبيب</li><li>إيرادات ومصروفات</li></ul></div>
           </div>
         </div>
       </div>
-    </div>
 
-  </div><!-- /main-content -->
-</div><!-- /layout -->
-
-<!-- ══ MODALS ══ -->
-
-<!-- Add Appointment -->
-<div class="modal-overlay" id="addApptModal">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>📅 حجز موعد جديد</h3>
-      <button class="modal-close" onclick="closeModal('addApptModal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group" style="grid-column:span 2;">
-          <label>المريض</label>
-          <select id="appt-patient" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;"></select>
-        </div>
-        <div class="form-group">
-          <label>الطبيب</label>
-          <select id="appt-doctor" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;"></select>
-        </div>
-        <div class="form-group">
-          <label>التاريخ</label>
-          <input type="date" id="appt-date">
-        </div>
-        <div class="form-group">
-          <label>الوقت</label>
-          <select id="appt-time" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
-            <option>09:00</option><option>09:30</option><option>10:00</option>
-            <option>10:30</option><option>11:00</option><option>11:30</option>
-            <option>12:00</option><option>12:30</option><option>13:00</option>
-            <option>13:30</option><option>14:00</option><option>14:30</option>
-            <option>15:00</option><option>15:30</option><option>16:00</option>
-          </select>
-        </div>
-        <div class="form-group" style="grid-column:span 2;">
-          <label>ملاحظات</label>
-          <input type="text" id="appt-notes" placeholder="ملاحظات اختيارية...">
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('addApptModal')">إلغاء</button>
-      <button class="btn btn-primary" onclick="submitAppointment()">✅ تأكيد الحجز</button>
     </div>
   </div>
 </div>
 
-<!-- Add Patient -->
-<div class="modal-overlay" id="addPatientModal">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>🧑‍🤝‍🧑 مريض جديد</h3>
-      <button class="modal-close" onclick="closeModal('addPatientModal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group" style="grid-column:span 2;">
-          <label>الاسم الكامل *</label>
-          <input type="text" id="pt-name" placeholder="اسم المريض">
-        </div>
-        <div class="form-group">
-          <label>رقم التليفون *</label>
-          <input type="text" id="pt-phone" placeholder="01xxxxxxxxx">
-        </div>
-        <div class="form-group">
-          <label>تاريخ الميلاد</label>
-          <input type="date" id="pt-bdate">
-        </div>
-        <div class="form-group" style="grid-column:span 2;">
-          <label>العنوان</label>
-          <input type="text" id="pt-address" placeholder="العنوان">
-        </div>
+<!-- MODALS -->
+<div class="overlay" id="mPt">
+  <div class="modal" style="max-width:440px;">
+    <div class="mh"><h3 id="mPtTitle">👤 مريض جديد</h3><button class="mx" onclick="closeM('mPt')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="ptEditId">
+      <div class="fg2">
+        <div class="fld2 sp2"><label>الاسم الكامل *</label><input id="ptN" placeholder="اسم المريض"></div>
+        <div class="fld2"><label>التليفون *</label><input id="ptP" placeholder="01xxxxxxxxx"></div>
+        <div class="fld2"><label>تاريخ الميلاد</label><input type="date" id="ptB"></div>
+        <div class="fld2 sp2"><label>العنوان</label><input id="ptA" placeholder="العنوان"></div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('addPatientModal')">إلغاء</button>
-      <button class="btn btn-primary" onclick="submitPatient()">💾 حفظ</button>
+    <div class="mf">
+      <button class="btn btn-g btn-sm" onclick="closeM('mPt')">إلغاء</button>
+      <button class="btn btn-p btn-sm" onclick="savePt()">💾 حفظ</button>
     </div>
   </div>
 </div>
 
-<!-- Add Doctor -->
-<div class="modal-overlay" id="addDoctorModal">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>👨‍⚕️ طبيب جديد</h3>
-      <button class="modal-close" onclick="closeModal('addDoctorModal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group" style="grid-column:span 2;">
-          <label>اسم الطبيب *</label>
-          <input type="text" id="dr-name" placeholder="د. محمد أحمد">
-        </div>
-        <div class="form-group">
-          <label>التخصص</label>
-          <input type="text" id="dr-specialty" placeholder="طب عام">
-        </div>
-        <div class="form-group">
-          <label>رقم التليفون</label>
-          <input type="text" id="dr-phone" placeholder="01xxxxxxxxx">
-        </div>
-        <div class="form-group">
-          <label>رسوم الكشف (ج)</label>
-          <input type="number" id="dr-fee" placeholder="200">
-        </div>
-        <div class="form-group">
-          <label>Chat ID تيليجرام</label>
-          <input type="text" id="dr-telegram" placeholder="123456789">
-        </div>
+<div class="overlay" id="mDr">
+  <div class="modal" style="max-width:440px;">
+    <div class="mh"><h3 id="mDrTitle">👨‍⚕️ طبيب جديد</h3><button class="mx" onclick="closeM('mDr')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="drEditId">
+      <div class="fg2">
+        <div class="fld2 sp2"><label>اسم الطبيب *</label><input id="drN" placeholder="د. محمد أحمد"></div>
+        <div class="fld2"><label>التخصص</label><input id="drSp" placeholder="طب عام"></div>
+        <div class="fld2"><label>التليفون</label><input id="drPh" placeholder="01xxxxxxxxx"></div>
+        <div class="fld2"><label>رسوم الكشف (ج)</label><input type="number" id="drFee" placeholder="200"></div>
+        <div class="fld2"><label>Chat ID تيليجرام</label><input id="drTg" placeholder="123456789"></div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('addDoctorModal')">إلغاء</button>
-      <button class="btn btn-primary" onclick="submitDoctor()">💾 حفظ</button>
+    <div class="mf">
+      <button class="btn btn-g btn-sm" onclick="closeM('mDr')">إلغاء</button>
+      <button class="btn btn-p btn-sm" onclick="saveDr()">💾 حفظ</button>
     </div>
   </div>
 </div>
 
-<!-- Add Invoice -->
-<div class="modal-overlay" id="addInvoiceModal">
-  <div class="modal" style="max-width:640px;">
-    <div class="modal-header">
-      <h3>🧾 فاتورة جديدة</h3>
-      <button class="modal-close" onclick="closeModal('addInvoiceModal')">✕</button>
+<div class="overlay" id="mInv">
+  <div class="modal" style="max-width:500px;">
+    <div class="mh"><h3 id="mInvTitle">🧾 فاتورة جديدة</h3><button class="mx" onclick="closeM('mInv')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="invEditId">
+      <div class="fg2" style="margin-bottom:10px;">
+        <div class="fld2"><label>المريض *</label><select id="ivPt"><option value="">اختر...</option></select></div>
+        <div class="fld2"><label>الطبيب *</label><select id="ivDr"><option value="">اختر...</option></select></div>
+      </div>
+      <p style="font-size:.77rem;font-weight:700;color:#475569;margin-bottom:5px;">الخدمات</p>
+      <div id="svcList">
+        <div class="svc-row">
+          <select class="svN" onchange="setSvP(this)" style="flex:2;"><option value="">اختر...</option><option data-p="200">كشف — 200 ج</option><option data-p="100">إعادة كشف — 100 ج</option><option data-p="150">أشعة — 150 ج</option><option data-p="100">تحاليل — 100 ج</option><option data-p="50">حقنة — 50 ج</option><option data-p="80">ضمادة — 80 ج</option></select>
+          <input type="number" class="svP" placeholder="سعر" style="width:72px;flex:none;" oninput="calcTot()">
+          <input type="number" class="svQ" value="1" min="1" style="width:48px;flex:none;" oninput="calcTot()">
+          <button class="btn btn-d btn-sm" onclick="rmSv(this)" style="flex:none;padding:4px 7px;">✕</button>
+        </div>
+      </div>
+      <button class="btn btn-g btn-sm" onclick="addSv()" style="margin:5px 0 11px;font-size:.7rem;">+ خدمة</button>
+      <div class="fg2">
+        <div class="fld2"><label>خصم (ج)</label><input type="number" id="ivDis" value="0" oninput="calcTot()"></div>
+        <div class="fld2"><label>المدفوع (ج)</label><input type="number" id="ivPaid" value="0" oninput="calcTot()"></div>
+        <div class="fld2 sp2"><label>طريقة الدفع</label><select id="ivMth"><option value="cash">💵 كاش</option><option value="card">💳 بطاقة</option><option value="vf">📱 فودافون</option><option value="tr">🏦 تحويل</option></select></div>
+      </div>
+      <div class="total-row"><span>الإجمالي بعد الخصم</span><span id="ivTot">0 ج</span></div>
     </div>
-    <div class="modal-body">
-      <div class="form-grid" style="margin-bottom:16px;">
-        <div class="form-group">
-          <label>المريض *</label>
-          <select id="inv-patient" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;"></select>
-        </div>
-        <div class="form-group">
-          <label>الطبيب *</label>
-          <select id="inv-doctor" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;"></select>
-        </div>
-      </div>
-
-      <div class="card-title" style="margin-bottom:8px;">الخدمات</div>
-      <div class="services-list" id="servicesList">
-        <div class="service-row">
-          <select class="svc-name" onchange="updateSvcPrice(this)" style="flex:2;">
-            <option value="">اختر الخدمة...</option>
-          </select>
-          <input type="number" class="svc-price" placeholder="السعر" style="flex:1;" oninput="calcInvoiceTotal()">
-          <input type="number" class="svc-qty" value="1" min="1" style="flex:.6;width:60px;" oninput="calcInvoiceTotal()">
-          <button class="btn btn-danger btn-sm" onclick="removeSvcRow(this)">✕</button>
-        </div>
-      </div>
-      <button class="btn btn-outline btn-sm" onclick="addSvcRow()" style="margin-bottom:12px;">+ إضافة خدمة</button>
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label>خصم (ج)</label>
-          <input type="number" id="inv-discount" value="0" oninput="calcInvoiceTotal()">
-        </div>
-        <div class="form-group">
-          <label>طريقة الدفع</label>
-          <select id="inv-payment" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
-            <option value="cash">كاش</option>
-            <option value="card">بطاقة</option>
-            <option value="transfer">تحويل</option>
-            <option value="vodafone">فودافون كاش</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>المدفوع (ج)</label>
-          <input type="number" id="inv-paid" value="0" oninput="calcInvoiceTotal()">
-        </div>
-        <div class="form-group">
-          <label>ملاحظات</label>
-          <input type="text" id="inv-notes" placeholder="ملاحظات...">
-        </div>
-      </div>
-
-      <div class="invoice-total">
-        <span>الإجمالي بعد الخصم:</span>
-        <span id="inv-total-display">0 ج</span>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('addInvoiceModal')">إلغاء</button>
-      <button class="btn btn-primary" onclick="submitInvoice()">💾 حفظ الفاتورة</button>
+    <div class="mf">
+      <button class="btn btn-g btn-sm" onclick="closeM('mInv')">إلغاء</button>
+      <button class="btn btn-p btn-sm" onclick="saveInv()">💾 حفظ</button>
     </div>
   </div>
 </div>
 
-<!-- Treasury Entry -->
-<div class="modal-overlay" id="treasuryModal">
-  <div class="modal" style="max-width:420px;">
-    <div class="modal-header">
-      <h3 id="treasuryModalTitle">إضافة معاملة</h3>
-      <button class="modal-close" onclick="closeModal('treasuryModal')">✕</button>
+<div class="overlay" id="mTr">
+  <div class="modal" style="max-width:350px;">
+    <div class="mh"><h3 id="trMTitle">💰 إضافة معاملة</h3><button class="mx" onclick="closeM('mTr')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="trEditId">
+      <div class="fld2" style="margin-bottom:9px;"><label>الفئة</label><select id="trCat"><option>فواتير</option><option>رواتب</option><option>مشتريات</option><option>إيجار</option><option>كهرباء</option><option>أخرى</option></select></div>
+      <div class="fld2" style="margin-bottom:9px;"><label>المبلغ (ج) *</label><input type="number" id="trAmt" placeholder="0"></div>
+      <div class="fld2"><label>البيان</label><input id="trDesc" placeholder="وصف..."></div>
     </div>
-    <div class="modal-body">
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <div class="form-group">
-          <label>الفئة</label>
-          <select id="tr-category" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
-            <option>فواتير</option><option>رواتب</option><option>مشتريات</option>
-            <option>إيجار</option><option>كهرباء</option><option>أخرى</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>المبلغ (ج) *</label>
-          <input type="number" id="tr-amount" placeholder="0">
-        </div>
-        <div class="form-group">
-          <label>البيان</label>
-          <input type="text" id="tr-desc" placeholder="وصف المعاملة">
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('treasuryModal')">إلغاء</button>
-      <button class="btn btn-primary" id="treasurySubmitBtn" onclick="submitTreasury()">💾 حفظ</button>
+    <div class="mf">
+      <button class="btn btn-g btn-sm" onclick="closeM('mTr')">إلغاء</button>
+      <button class="btn btn-p btn-sm" id="trSvBtn" onclick="saveTr()">💾 حفظ</button>
     </div>
   </div>
 </div>
 
-<!-- Toast -->
-<div class="toast" id="toast"></div>
+<!-- CONFIRM -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div style="font-size:2.5rem;margin-bottom:10px;">🗑️</div>
+    <h4 id="confirmTitle">تأكيد الحذف</h4>
+    <p id="confirmMsg">هل أنت متأكد من حذف هذا العنصر؟</p>
+    <div class="confirm-btns">
+      <button class="btn btn-g btn-sm" onclick="closeConfirm()">إلغاء</button>
+      <button class="btn btn-d btn-sm" id="confirmOkBtn">🗑️ حذف</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
 
 <script>
-const API = 'http://localhost:5000/api';
-let currentUser = null;
-let services = [];
-let patients = [];
-let doctors = [];
-let treasuryType = 'income';
-let currentInvoiceFilter = '';
+const today=new Date().toISOString().split('T')[0];
+const TITLES={booking:'حجز موعد',queue:'قائمة الانتظار',patients:'المرضى',doctors:'الأطباء',invoices:'الفواتير',treasury:'الخزنة',reports:'التقارير',telegram:'التيليجرام'};
+let IDs={pt:6,dr:4,ap:5,inv:4,tr:6};
+let trType='income', invF='', confirmCB=null;
 
-// ── Auth ─────────────────────────────────────────────────────────────────────
-async function doLogin() {
-  const u = document.getElementById('loginUser').value;
-  const p = document.getElementById('loginPass').value;
-  
-  // Demo mode — bypass backend
-  const users = {
-    'admin': {username:'admin',role:'admin',name:'المدير'},
-    'reception': {username:'reception',role:'reception',name:'موظف الاستقبال'}
-  };
-  const passwords = {'admin':'admin123','reception':'rec123'};
-  
-  if (users[u] && passwords[u] === p) {
-    currentUser = users[u];
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'flex';
-    document.getElementById('userName').textContent = currentUser.name;
-    document.getElementById('userRole').textContent = currentUser.role === 'admin' ? 'مدير النظام' : 'موظف استقبال';
-    document.getElementById('userAvatar').textContent = currentUser.name[0];
+let patients=[
+  {id:1,name:'أحمد محمد علي',phone:'01001234567',bdate:'1990-05-15',addr:'القاهرة'},
+  {id:2,name:'سارة إبراهيم',phone:'01112345678',bdate:'1985-08-22',addr:'الجيزة'},
+  {id:3,name:'محمود حسن',phone:'01223456789',bdate:'1978-12-03',addr:'الإسكندرية'},
+  {id:4,name:'فاطمة أحمد',phone:'01334567890',bdate:'1995-07-19',addr:'المنصورة'},
+  {id:5,name:'كريم عبدالله',phone:'01445678901',bdate:'2001-02-28',addr:'القاهرة'},
+];
+let doctors=[
+  {id:1,name:'د. أحمد محمد',sp:'طب عام',ph:'01001111111',fee:200,tg:''},
+  {id:2,name:'د. سارة علي',sp:'طب أسنان',ph:'01002222222',fee:300,tg:''},
+  {id:3,name:'د. محمود حسن',sp:'عيون',ph:'01003333333',fee:350,tg:''},
+];
+let appts=[];
+let invoices=[];
+let treasury=[];
+const allTimes=['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'];
+
+// AUTH
+function doLogin(){
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value.trim();
+  const creds={admin:'admin123',reception:'rec123'};
+  if(creds[u]===p){
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('appShell').style.display='flex';
+    document.getElementById('uname').textContent=u==='admin'?'المدير':'موظف الاستقبال';
+    document.getElementById('uav').textContent=u==='admin'?'م':'إ';
+    document.getElementById('urole').textContent=u==='admin'?'مدير النظام':'موظف استقبال';
     initApp();
+  } else { toast('❌ بيانات الدخول غلط'); }
+}
+function doLogout(){
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('loginPage').style.display='flex';
+}
+
+function initApp(){
+  const now=new Date();
+  document.getElementById('dateNow').textContent=now.toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('bkDt').value=today;
+  document.getElementById('qDate').value=today;
+  document.getElementById('rpDate').value=today;
+  fillSelects(); loadTimes(); renderQueue(); renderPts(); renderDrs(); renderInvoices(); renderTreasury(); renderDrBot(); updateStats();
+}
+
+function go(id,el){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  if(el)el.classList.add('on');
+  document.getElementById('pgTitle').textContent=TITLES[id]||id;
+}
+
+function fillSelects(){
+  const ptO='<option value="">اختر المريض...</option>'+patients.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  const drO='<option value="">اختر الطبيب...</option>'+doctors.map(d=>`<option value="${d.id}">${d.name} — ${d.sp}</option>`).join('');
+  document.getElementById('bkPt').innerHTML=ptO;
+  document.getElementById('bkDr').innerHTML=drO;
+  document.getElementById('ivPt').innerHTML='<option value="">اختر...</option>'+patients.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  document.getElementById('ivDr').innerHTML='<option value="">اختر...</option>'+doctors.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+  const qDr=document.getElementById('qDr');
+  qDr.innerHTML='<option value="">كل الأطباء</option>'+doctors.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+}
+
+function loadTimes(){
+  const drId=document.getElementById('bkDr').value;
+  const dt=document.getElementById('bkDt').value;
+  const booked=appts.filter(a=>String(a.drId)===String(drId)&&a.dt===dt&&a.st!=='canc').map(a=>a.tm);
+  const avail=allTimes.filter(t=>!booked.includes(t));
+  document.getElementById('bkTm').innerHTML=avail.length?avail.map(t=>`<option>${t}</option>`).join(''):'<option>لا مواعيد متاحة</option>';
+}
+
+function submitBooking(){
+  const ptId=document.getElementById('bkPt').value;
+  const drId=document.getElementById('bkDr').value;
+  const dt=document.getElementById('bkDt').value;
+  const tm=document.getElementById('bkTm').value;
+  if(!ptId||!drId||!dt){toast('⚠️ يرجى اختيار المريض والطبيب والموعد');return;}
+  const pt=patients.find(p=>p.id==ptId);
+  const dr=doctors.find(d=>d.id==drId);
+  appts.unshift({id:IDs.ap++,ptName:pt.name,ph:pt.phone,drName:dr.name,drId:parseInt(drId),dt,tm,st:'pending'});
+  renderQueue();loadTimes();updateStats();
+  toast(`✅ تم حجز موعد ${pt.name} مع ${dr.name} الساعة ${tm}`);
+}
+
+function updateStats(){
+  document.getElementById('s-appts').textContent=appts.filter(a=>a.dt===today).length;
+  const inc=treasury.filter(t=>t.type==='income').reduce((a,t)=>a+t.amt,0);
+  const exp=treasury.filter(t=>t.type==='expense').reduce((a,t)=>a+t.amt,0);
+  document.getElementById('s-rev').textContent=inc.toLocaleString();
+  document.getElementById('s-bal').textContent=(inc-exp).toLocaleString();
+  document.getElementById('s-unp').textContent=invoices.filter(i=>i.st==='unp').length;
+}
+
+// QUEUE
+function renderQueue(){
+  const dt=document.getElementById('qDate')?.value||today;
+  const drF=document.getElementById('qDr')?.value||'';
+  let list=appts.filter(a=>a.dt===dt);
+  if(drF)list=list.filter(a=>String(a.drId)===String(drF));
+  list.sort((a,b)=>a.tm.localeCompare(b.tm));
+  document.getElementById('qCount').textContent=list.length+' حجز';
+  document.getElementById('queueList').innerHTML=list.length?list.map((a,i)=>`
+    <div class="qcard">
+      <div class="qnum">${i+1}</div>
+      <div class="qinfo"><div class="qname">${a.ptName}</div><div class="qsub">${a.drName} | ${a.ph}</div></div>
+      <div class="qtm">${a.tm}</div>
+      <span class="sb2 ${stCls(a.st)}">${stL(a.st)}</span>
+      <div style="display:flex;gap:4px;margin-right:4px;">
+        <button class="btn btn-s btn-sm" onclick="chSt(${a.id},'done')" title="منتهي">✔</button>
+        <button class="btn btn-d btn-sm" onclick="chSt(${a.id},'canc')" title="إلغاء">✕</button>
+        <button class="btn btn-w btn-sm" onclick="editAppt(${a.id})" title="تعديل">✏️</button>
+        <button class="btn btn-g btn-sm" onclick="openM('mInv')" title="فاتورة">🧾</button>
+      </div>
+    </div>`).join(''):'<div style="text-align:center;padding:28px;color:#94a3b8;font-size:.83rem;">لا توجد حجوزات في هذا اليوم</div>';
+}
+
+function chSt(id,st){
+  const a=appts.find(x=>x.id===id);if(a)a.st=st;
+  renderQueue();toast('✅ تم تحديث الحالة');
+}
+
+function editAppt(id){
+  const a=appts.find(x=>x.id===id);if(!a)return;
+  // Simple: just change status via prompt-like approach
+  const newTime=prompt('الوقت الجديد (مثال: 10:30):',a.tm);
+  if(newTime&&allTimes.includes(newTime)){a.tm=newTime;renderQueue();toast('✅ تم تعديل الموعد');}
+  else if(newTime){toast('⚠️ وقت غير صحيح');}
+}
+
+// PATIENTS
+function renderPts(){
+  const q=(document.getElementById('ptSrch')||{}).value||'';
+  const list=q?patients.filter(p=>p.name.includes(q)||p.phone.includes(q)):patients;
+  document.getElementById('ptTbl').innerHTML=list.map(p=>`
+    <tr>
+      <td>#${p.id}</td><td><strong>${p.name}</strong></td>
+      <td dir="ltr" style="text-align:right;">${p.phone}</td>
+      <td>${p.bdate||'—'}</td><td>${p.addr||'—'}</td>
+      <td style="display:flex;gap:4px;">
+        <button class="btn btn-w btn-sm" onclick="editPt(${p.id})">✏️ تعديل</button>
+        <button class="btn btn-d btn-sm" onclick="delPt(${p.id})">🗑️ حذف</button>
+      </td>
+    </tr>`).join('');
+}
+
+function editPt(id){
+  const p=patients.find(x=>x.id===id);if(!p)return;
+  document.getElementById('mPtTitle').textContent='✏️ تعديل بيانات المريض';
+  document.getElementById('ptEditId').value=id;
+  document.getElementById('ptN').value=p.name;
+  document.getElementById('ptP').value=p.phone;
+  document.getElementById('ptB').value=p.bdate||'';
+  document.getElementById('ptA').value=p.addr||'';
+  openM('mPt');
+}
+
+function delPt(id){
+  const p=patients.find(x=>x.id===id);
+  confirm2(`حذف المريض "${p?.name}"؟`,'سيتم حذف بيانات المريض نهائياً',()=>{
+    patients=patients.filter(x=>x.id!==id);
+    renderPts();fillSelects();toast('🗑️ تم حذف المريض');
+  });
+}
+
+function savePt(){
+  const name=document.getElementById('ptN').value.trim();
+  const phone=document.getElementById('ptP').value.trim();
+  if(!name||!phone){toast('⚠️ الاسم والتليفون مطلوبان');return;}
+  const editId=parseInt(document.getElementById('ptEditId').value)||0;
+  if(editId){
+    const p=patients.find(x=>x.id===editId);
+    if(p){p.name=name;p.phone=phone;p.bdate=document.getElementById('ptB').value;p.addr=document.getElementById('ptA').value;}
+    toast('✅ تم تعديل بيانات المريض');
   } else {
-    toast('❌ بيانات خاطئة', 'error');
+    patients.push({id:IDs.pt++,name,phone,bdate:document.getElementById('ptB').value,addr:document.getElementById('ptA').value});
+    toast('✅ تم إضافة المريض');
   }
+  closeM('mPt');renderPts();fillSelects();
+  document.getElementById('ptEditId').value='';
+  document.getElementById('mPtTitle').textContent='👤 مريض جديد';
 }
 
-function doLogout() {
-  document.getElementById('mainApp').style.display = 'none';
-  document.getElementById('loginPage').style.display = 'flex';
-  currentUser = null;
-}
-
-// ── App Init ─────────────────────────────────────────────────────────────────
-function initApp() {
-  setDateInputs();
-  loadDashboard();
-  loadPatients();
-  loadDoctors();
-  loadAppointments();
-  loadInvoices();
-  loadTreasury();
-  loadServicesForInvoice();
-  
-  // Update date display
-  const now = new Date();
-  const options = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
-  document.getElementById('currentDate').textContent = now.toLocaleDateString('ar-EG', options);
-}
-
-function setDateInputs() {
-  const today = new Date().toISOString().split('T')[0];
-  const inputs = ['apptDateFilter','appt-date','reportDate'];
-  inputs.forEach(id => { const el = document.getElementById(id); if(el) el.value = today; });
-}
-
-// ── Navigation ────────────────────────────────────────────────────────────────
-const titles = {
-  dashboard:'لوحة التحكم', appointments:'الحجوزات', patients:'المرضى',
-  doctors:'الأطباء', invoices:'الفواتير', treasury:'الخزنة',
-  reports:'التقارير', telegram:'بوت تيليجرام'
-};
-
-function showPage(id, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  if (el) el.classList.add('active');
-  document.getElementById('pageTitle').textContent = titles[id] || id;
-  
-  if (id === 'appointments') { loadAppointments(); populateApptSelects(); }
-  if (id === 'invoices') loadInvoices();
-  if (id === 'treasury') loadTreasury();
-  if (id === 'telegram') loadDoctorsBotList();
-}
-
-// ── Demo Data ─────────────────────────────────────────────────────────────────
-function genDemoData() {
-  const demoPatients = [
-    {id:1,name:'أحمد محمد علي',phone:'01001234567',birth_date:'1990-05-15',address:'القاهرة',created_at:'2024-01-10'},
-    {id:2,name:'سارة إبراهيم',phone:'01112345678',birth_date:'1985-08-22',address:'الجيزة',created_at:'2024-02-14'},
-    {id:3,name:'محمود حسن',phone:'01223456789',birth_date:'1978-12-03',address:'الإسكندرية',created_at:'2024-03-05'},
-    {id:4,name:'فاطمة أحمد',phone:'01334567890',birth_date:'1995-07-19',address:'المنصورة',created_at:'2024-03-20'},
-    {id:5,name:'كريم عبدالله',phone:'01445678901',birth_date:'2001-02-28',address:'القاهرة',created_at:'2024-04-01'},
-  ];
-  
-  const demoDoctors = [
-    {id:1,name:'د. أحمد محمد',specialty:'طب عام',phone:'01001111111',fee:200,telegram_chat_id:''},
-    {id:2,name:'د. سارة علي',specialty:'طب أسنان',phone:'01002222222',fee:300,telegram_chat_id:''},
-    {id:3,name:'د. محمود حسن',specialty:'عيون',phone:'01003333333',fee:350,telegram_chat_id:''},
-  ];
-  
-  const today = new Date().toISOString().split('T')[0];
-  const demoAppts = [
-    {id:1,patient_name:'أحمد محمد علي',phone:'01001234567',doctor_name:'د. أحمد محمد',appointment_date:today,appointment_time:'09:00',status:'confirmed'},
-    {id:2,patient_name:'سارة إبراهيم',phone:'01112345678',doctor_name:'د. سارة علي',appointment_date:today,appointment_time:'09:30',status:'pending'},
-    {id:3,patient_name:'محمود حسن',phone:'01223456789',doctor_name:'د. محمود حسن',appointment_date:today,appointment_time:'10:00',status:'completed'},
-    {id:4,patient_name:'فاطمة أحمد',phone:'01334567890',doctor_name:'د. أحمد محمد',appointment_date:today,appointment_time:'10:30',status:'pending'},
-  ];
-  
-  const demoInvoices = [
-    {id:1,patient_name:'أحمد محمد علي',doctor_name:'د. أحمد محمد',total:350,paid:350,discount:0,payment_method:'cash',status:'paid',created_at:'2024-04-30 09:15'},
-    {id:2,patient_name:'سارة إبراهيم',doctor_name:'د. سارة علي',total:600,paid:300,discount:50,payment_method:'card',status:'partial',created_at:'2024-04-30 10:00'},
-    {id:3,patient_name:'محمود حسن',doctor_name:'د. محمود حسن',total:500,paid:0,discount:0,payment_method:'cash',status:'unpaid',created_at:'2024-04-30 11:30'},
-  ];
-  
-  const demoTreasury = [
-    {id:1,type:'income',category:'فواتير',amount:350,description:'فاتورة #1',created_at:'2024-04-30 09:15'},
-    {id:2,type:'income',category:'فواتير',amount:300,description:'دفعة فاتورة #2',created_at:'2024-04-30 10:05'},
-    {id:3,type:'expense',category:'مشتريات',amount:150,description:'مستلزمات طبية',created_at:'2024-04-30 12:00'},
-    {id:4,type:'income',category:'فواتير',amount:500,description:'فاتورة #4',created_at:'2024-04-29 14:30'},
-    {id:5,type:'expense',category:'كهرباء',amount:200,description:'فاتورة كهرباء',created_at:'2024-04-28 10:00'},
-  ];
-  
-  const demoWeekly = [
-    {day:'السبت',total:1200},{day:'الأحد',total:850},{day:'الاثنين',total:1450},
-    {day:'الثلاثاء',total:1100},{day:'الأربعاء',total:900},{day:'الخميس',total:1650},{day:'اليوم',total:650},
-  ];
-  
-  return {demoPatients,demoDoctors,demoAppts,demoInvoices,demoTreasury,demoWeekly};
-}
-
-// ── Dashboard ─────────────────────────────────────────────────────────────────
-function loadDashboard() {
-  const {demoAppts,demoInvoices,demoTreasury,demoWeekly,demoDoctors} = genDemoData();
-  
-  document.getElementById('stat-revenue').textContent = '650';
-  document.getElementById('stat-appts').textContent = demoAppts.length;
-  document.getElementById('stat-patients').textContent = '4';
-  document.getElementById('stat-pending-inv').textContent = '1';
-  document.getElementById('stat-monthly').textContent = '18,500';
-  document.getElementById('stat-treasury').textContent = '2,300';
-  
-  // Chart
-  const maxVal = Math.max(...demoWeekly.map(w => w.total));
-  const chartEl = document.getElementById('weeklyChart');
-  chartEl.innerHTML = demoWeekly.map(w => `
-    <div class="chart-bar-wrap">
-      <div class="chart-bar" style="height:${(w.total/maxVal)*100}%;"></div>
-      <div class="chart-label">${w.day}</div>
-    </div>
-  `).join('');
-  
-  // Doctor stats
-  const docStatsEl = document.getElementById('doctorStatsToday');
-  docStatsEl.innerHTML = demoDoctors.map(d => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f7fafc;border-radius:8px;">
-      <div>
-        <div style="font-weight:700;font-size:.88rem;">${d.name}</div>
-        <div style="font-size:.75rem;color:var(--text2);">${d.specialty}</div>
+// DOCTORS
+function renderDrs(){
+  document.getElementById('drGrid').innerHTML=doctors.map(d=>`
+    <div class="dr-card">
+      <div class="dr-av">${d.name.split(' ')[1]?.[0]||'د'}</div>
+      <div style="font-size:.9rem;font-weight:900;">${d.name}</div>
+      <div style="font-size:.74rem;color:#0ea5e9;font-weight:700;margin-bottom:7px;">${d.sp}</div>
+      <div style="font-size:.74rem;color:#64748b;display:flex;flex-direction:column;gap:3px;">
+        <span>📞 ${d.ph}</span>
+        <span>💰 كشف: <strong>${d.fee} ج</strong></span>
       </div>
-      <div style="text-align:left;">
-        <div style="font-weight:800;color:var(--primary);font-size:.95rem;">${(d.fee * 2).toLocaleString()} ج</div>
-        <div style="font-size:.72rem;color:var(--text2);">مريضان</div>
+      <div style="display:flex;gap:5px;margin-top:10px;">
+        <button class="btn btn-w btn-sm" onclick="editDr(${d.id})">✏️</button>
+        <button class="btn btn-d btn-sm" onclick="delDr(${d.id})">🗑️</button>
+        <button class="btn btn-p btn-sm" onclick="go('booking',document.querySelectorAll('.ni')[0])">📅 موعد</button>
       </div>
-    </div>
-  `).join('');
-  
-  // Recent appointments
-  const tbody = document.getElementById('recentAppointments');
-  tbody.innerHTML = demoAppts.map(a => `
-    <tr>
-      <td>#${a.id}</td>
-      <td><strong>${a.patient_name}</strong></td>
-      <td>${a.doctor_name}</td>
-      <td>${a.appointment_date}</td>
-      <td>${a.appointment_time}</td>
-      <td><span class="badge badge-${a.status}">${statusLabel(a.status)}</span></td>
-    </tr>
-  `).join('');
+    </div>`).join('');
 }
 
-// ── Appointments ──────────────────────────────────────────────────────────────
-function loadAppointments() {
-  const {demoAppts} = genDemoData();
-  const tbody = document.getElementById('appointmentsTable');
-  tbody.innerHTML = demoAppts.map(a => `
-    <tr>
-      <td>#${a.id}</td>
-      <td><strong>${a.patient_name}</strong></td>
-      <td>${a.phone}</td>
-      <td>${a.doctor_name}</td>
-      <td><strong>${a.appointment_time}</strong></td>
-      <td><span class="badge badge-${a.status}">${statusLabel(a.status)}</span></td>
-      <td>
-        <div style="display:flex;gap:4px;">
-          <button class="btn btn-success btn-sm" onclick="changeStatus(${a.id},'completed')">✔</button>
-          <button class="btn btn-danger btn-sm" onclick="changeStatus(${a.id},'cancelled')">✕</button>
-          <button class="btn btn-accent btn-sm" onclick="openInvoiceForAppt(${a.id})">🧾</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+function editDr(id){
+  const d=doctors.find(x=>x.id===id);if(!d)return;
+  document.getElementById('mDrTitle').textContent='✏️ تعديل بيانات الطبيب';
+  document.getElementById('drEditId').value=id;
+  document.getElementById('drN').value=d.name;
+  document.getElementById('drSp').value=d.sp;
+  document.getElementById('drPh').value=d.ph;
+  document.getElementById('drFee').value=d.fee;
+  document.getElementById('drTg').value=d.tg;
+  openM('mDr');
 }
 
-function populateApptSelects() {
-  const {demoPatients,demoDoctors} = genDemoData();
-  const pSel = document.getElementById('appt-patient');
-  const dSel = document.getElementById('appt-doctor');
-  if (pSel) pSel.innerHTML = demoPatients.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-  if (dSel) dSel.innerHTML = demoDoctors.map(d => `<option value="${d.id}">${d.name} — ${d.specialty}</option>`).join('');
-  
-  // Doctor filter
-  const df = document.getElementById('apptDoctorFilter');
-  if (df) df.innerHTML = '<option value="">كل الأطباء</option>' + demoDoctors.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+function delDr(id){
+  const d=doctors.find(x=>x.id===id);
+  confirm2(`حذف الطبيب "${d?.name}"؟`,'سيتم حذف الطبيب نهائياً',()=>{
+    doctors=doctors.filter(x=>x.id!==id);
+    renderDrs();fillSelects();renderDrBot();toast('🗑️ تم حذف الطبيب');
+  });
 }
 
-function changeStatus(id, status) {
-  toast(`✅ تم تحديث الحالة إلى: ${statusLabel(status)}`);
-  loadAppointments();
+function saveDr(){
+  const name=document.getElementById('drN').value.trim();
+  if(!name){toast('⚠️ اسم الطبيب مطلوب');return;}
+  const editId=parseInt(document.getElementById('drEditId').value)||0;
+  if(editId){
+    const d=doctors.find(x=>x.id===editId);
+    if(d){d.name=name;d.sp=document.getElementById('drSp').value;d.ph=document.getElementById('drPh').value;d.fee=parseFloat(document.getElementById('drFee').value)||200;d.tg=document.getElementById('drTg').value;}
+    toast('✅ تم تعديل بيانات الطبيب');
+  } else {
+    doctors.push({id:IDs.dr++,name,sp:document.getElementById('drSp').value,ph:document.getElementById('drPh').value,fee:parseFloat(document.getElementById('drFee').value)||200,tg:document.getElementById('drTg').value});
+    toast('✅ تم إضافة الطبيب');
+  }
+  closeM('mDr');renderDrs();fillSelects();renderDrBot();
+  document.getElementById('drEditId').value='';
+  document.getElementById('mDrTitle').textContent='👨‍⚕️ طبيب جديد';
 }
 
-function openInvoiceForAppt(id) {
-  openModal('addInvoiceModal');
-}
-
-function submitAppointment() {
-  const patient = document.getElementById('appt-patient').value;
-  const doctor = document.getElementById('appt-doctor').value;
-  const date = document.getElementById('appt-date').value;
-  const time = document.getElementById('appt-time').value;
-  if (!patient || !doctor || !date || !time) { toast('⚠️ يرجى ملء جميع البيانات', 'warn'); return; }
-  closeModal('addApptModal');
-  toast('✅ تم حجز الموعد بنجاح');
-  loadAppointments();
-}
-
-// ── Patients ──────────────────────────────────────────────────────────────────
-function loadPatients(q='') {
-  const {demoPatients} = genDemoData();
-  const filtered = q ? demoPatients.filter(p => p.name.includes(q) || p.phone.includes(q)) : demoPatients;
-  const tbody = document.getElementById('patientsTable');
-  tbody.innerHTML = filtered.map(p => `
-    <tr>
-      <td>#${p.id}</td>
-      <td><strong>${p.name}</strong></td>
-      <td dir="ltr">${p.phone}</td>
-      <td>${p.birth_date || '—'}</td>
-      <td>${p.address || '—'}</td>
-      <td style="font-size:.75rem;color:var(--text2);">${p.created_at.split(' ')[0]}</td>
-      <td>
-        <button class="btn btn-outline btn-sm" onclick="toast('📋 عرض سجل المريض')">📋 السجل</button>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function searchPatients() {
-  loadPatients(document.getElementById('patientSearch').value);
-}
-
-function submitPatient() {
-  const name = document.getElementById('pt-name').value;
-  const phone = document.getElementById('pt-phone').value;
-  if (!name || !phone) { toast('⚠️ الاسم والتليفون مطلوبان', 'warn'); return; }
-  closeModal('addPatientModal');
-  toast('✅ تم إضافة المريض بنجاح');
-  loadPatients();
-}
-
-// ── Doctors ───────────────────────────────────────────────────────────────────
-function loadDoctors() {
-  const {demoDoctors} = genDemoData();
-  const grid = document.getElementById('doctorsGrid');
-  grid.innerHTML = demoDoctors.map(d => `
-    <div class="card" style="border-top:4px solid var(--accent);">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-        <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.2rem;">
-          ${d.name.split(' ')[1]?.[0] || 'د'}
-        </div>
-        <div>
-          <div style="font-weight:800;font-size:1rem;color:var(--primary);">${d.name}</div>
-          <div style="font-size:.8rem;color:var(--accent);font-weight:600;">${d.specialty}</div>
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;font-size:.84rem;color:var(--text2);">
-        <div>📞 ${d.phone}</div>
-        <div>💰 رسوم الكشف: <strong style="color:var(--primary);">${d.fee} ج</strong></div>
-        <div>✈️ تيليجرام: ${d.telegram_chat_id || '<span style="color:#a0aec0;">غير مربوط</span>'}</div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:14px;">
-        <button class="btn btn-outline btn-sm" onclick="toast('📊 تقرير ${d.name}')">📊 تقرير</button>
-        <button class="btn btn-accent btn-sm" onclick="openModal('addApptModal')">📅 موعد</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function submitDoctor() {
-  const name = document.getElementById('dr-name').value;
-  if (!name) { toast('⚠️ اسم الطبيب مطلوب', 'warn'); return; }
-  closeModal('addDoctorModal');
-  toast('✅ تم إضافة الطبيب بنجاح');
-  loadDoctors();
-}
-
-// ── Invoices ──────────────────────────────────────────────────────────────────
-function loadInvoices(status='') {
-  const {demoInvoices} = genDemoData();
-  const filtered = status ? demoInvoices.filter(i => i.status === status) : demoInvoices;
-  const tbody = document.getElementById('invoicesTable');
-  tbody.innerHTML = filtered.map(inv => {
-    const remaining = inv.total - inv.paid - inv.discount;
-    return `
-    <tr>
-      <td>#${inv.id}</td>
-      <td><strong>${inv.patient_name}</strong></td>
-      <td>${inv.doctor_name}</td>
+// INVOICES
+function renderInvoices(){
+  const list=invF?invoices.filter(i=>i.st===invF):invoices;
+  document.getElementById('invTbl').innerHTML=list.length?list.map(inv=>{
+    const rem=inv.total-inv.paid-inv.dis;
+    return `<tr>
+      <td>#${inv.id}</td><td><strong>${inv.pt}</strong></td><td>${inv.dr}</td>
       <td style="font-weight:700;">${inv.total.toLocaleString()} ج</td>
-      <td style="color:var(--accent2);font-weight:600;">${inv.paid.toLocaleString()} ج</td>
-      <td style="color:${remaining>0?'var(--danger)':'var(--accent2)'};font-weight:600;">${remaining.toLocaleString()} ج</td>
-      <td>${paymentLabel(inv.payment_method)}</td>
-      <td><span class="badge badge-${inv.status}">${invStatusLabel(inv.status)}</span></td>
-      <td style="font-size:.8rem;">${inv.created_at}</td>
-      <td>
-        ${remaining > 0 ? `<button class="btn btn-success btn-sm" onclick="payInvoice(${inv.id},${remaining})">💵 دفع</button>` : '✅'}
+      <td style="color:#22c55e;font-weight:700;">${inv.paid.toLocaleString()} ج</td>
+      <td style="color:${rem>0?'#ef4444':'#22c55e'};font-weight:700;">${rem.toLocaleString()} ج</td>
+      <td>${mthL(inv.mth)}</td>
+      <td><span class="sb2 ${invStCls(inv.st)}">${invL(inv.st)}</span></td>
+      <td style="display:flex;gap:4px;">
+        ${rem>0?`<button class="btn btn-s btn-sm" onclick="payInv(${inv.id},${rem})">💵 دفع</button>`:''}
+        <button class="btn btn-w btn-sm" onclick="editInv(${inv.id})">✏️</button>
+        <button class="btn btn-d btn-sm" onclick="delInv(${inv.id})">🗑️</button>
       </td>
-    </tr>`;
-  }).join('');
-  
-  // Populate selects
-  const {demoPatients,demoDoctors} = genDemoData();
-  const ipSel = document.getElementById('inv-patient');
-  const idSel = document.getElementById('inv-doctor');
-  if (ipSel) ipSel.innerHTML = demoPatients.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-  if (idSel) idSel.innerHTML = demoDoctors.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+    </tr>`;}).join(''):'<tr><td colspan="9" style="text-align:center;padding:20px;color:#94a3b8;">لا توجد فواتير</td></tr>';
+  updateStats();
 }
 
-function filterInvoices(status, el) {
-  currentInvoiceFilter = status;
-  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
-  if (el) el.classList.add('active');
-  loadInvoices(status);
+function filtInv(f,el){
+  invF=f;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  if(el)el.classList.add('on');
+  renderInvoices();
 }
 
-function loadServicesForInvoice() {
-  services = [
-    {id:1,name:'كشف',price:200},{id:2,name:'إعادة كشف',price:100},
-    {id:3,name:'أشعة',price:150},{id:4,name:'تحاليل',price:100},
-    {id:5,name:'حقنة',price:50},{id:6,name:'ضمادة',price:80},
-  ];
-  updateSvcSelects();
+function editInv(id){
+  const inv=invoices.find(x=>x.id===id);if(!inv)return;
+  document.getElementById('mInvTitle').textContent='✏️ تعديل الفاتورة';
+  document.getElementById('invEditId').value=id;
+  // Fill form fields
+  document.getElementById('ivDis').value=inv.dis;
+  document.getElementById('ivPaid').value=inv.paid;
+  calcTot();
+  openM('mInv');
 }
 
-function updateSvcSelects() {
-  document.querySelectorAll('.svc-name').forEach(sel => {
-    const current = sel.value;
-    sel.innerHTML = '<option value="">اختر الخدمة...</option>' + 
-      services.map(s => `<option value="${s.id}" data-price="${s.price}">${s.name} — ${s.price} ج</option>`).join('');
-    if (current) sel.value = current;
+function delInv(id){
+  confirm2('حذف الفاتورة؟','سيتم حذف الفاتورة نهائياً',()=>{
+    invoices=invoices.filter(x=>x.id!==id);
+    renderInvoices();toast('🗑️ تم حذف الفاتورة');
   });
 }
 
-function addSvcRow() {
-  const list = document.getElementById('servicesList');
-  const div = document.createElement('div');
-  div.className = 'service-row';
-  div.innerHTML = `
-    <select class="svc-name" onchange="updateSvcPrice(this)" style="flex:2;">
-      <option value="">اختر الخدمة...</option>
-      ${services.map(s => `<option value="${s.id}" data-price="${s.price}">${s.name} — ${s.price} ج</option>`).join('')}
-    </select>
-    <input type="number" class="svc-price" placeholder="السعر" style="flex:1;" oninput="calcInvoiceTotal()">
-    <input type="number" class="svc-qty" value="1" min="1" style="flex:.6;width:60px;" oninput="calcInvoiceTotal()">
-    <button class="btn btn-danger btn-sm" onclick="removeSvcRow(this)">✕</button>
-  `;
-  list.appendChild(div);
+function payInv(id,rem){
+  const inv=invoices.find(i=>i.id===id);
+  if(inv){inv.paid+=rem;inv.st='paid';treasury.unshift({id:IDs.tr++,type:'income',cat:'فواتير',amt:rem,desc:`دفعة فاتورة #${id}`,dt:nowT()});}
+  renderInvoices();renderTreasury();toast('💵 تم تسجيل الدفعة');
 }
 
-function removeSvcRow(btn) {
-  btn.closest('.service-row').remove();
-  calcInvoiceTotal();
+function addSv(){
+  const div=document.createElement('div');div.className='svc-row';
+  div.innerHTML=`<select class="svN" onchange="setSvP(this)" style="flex:2;"><option value="">اختر...</option><option data-p="200">كشف — 200 ج</option><option data-p="100">إعادة كشف — 100 ج</option><option data-p="150">أشعة — 150 ج</option><option data-p="100">تحاليل — 100 ج</option><option data-p="50">حقنة — 50 ج</option><option data-p="80">ضمادة — 80 ج</option></select><input type="number" class="svP" placeholder="سعر" style="width:72px;flex:none;" oninput="calcTot()"><input type="number" class="svQ" value="1" min="1" style="width:48px;flex:none;" oninput="calcTot()"><button class="btn btn-d btn-sm" onclick="rmSv(this)" style="flex:none;padding:4px 7px;">✕</button>`;
+  document.getElementById('svcList').appendChild(div);
+}
+function rmSv(btn){btn.closest('.svc-row').remove();calcTot();}
+function setSvP(sel){const p=sel.options[sel.selectedIndex].dataset.p||'';sel.closest('.svc-row').querySelector('.svP').value=p;calcTot();}
+function calcTot(){
+  let tot=0;document.querySelectorAll('.svc-row').forEach(r=>{tot+=(parseFloat(r.querySelector('.svP').value)||0)*(parseFloat(r.querySelector('.svQ').value)||1);});
+  document.getElementById('ivTot').textContent=(tot-(parseFloat(document.getElementById('ivDis').value)||0)).toLocaleString()+' ج';
+}
+function saveInv(){
+  const ptId=document.getElementById('ivPt').value,drId=document.getElementById('ivDr').value;
+  if(!ptId||!drId){toast('⚠️ اختر المريض والطبيب');return;}
+  let tot=0;document.querySelectorAll('.svc-row').forEach(r=>{tot+=(parseFloat(r.querySelector('.svP').value)||0)*(parseFloat(r.querySelector('.svQ').value)||1);});
+  const dis=parseFloat(document.getElementById('ivDis').value)||0;
+  const paid=parseFloat(document.getElementById('ivPaid').value)||0;
+  const net=tot-dis;
+  const st=paid>=net?'paid':paid>0?'part':'unp';
+  const editId=parseInt(document.getElementById('invEditId').value)||0;
+  if(editId){
+    const inv=invoices.find(x=>x.id===editId);
+    if(inv){inv.total=net;inv.paid=paid;inv.dis=dis;inv.mth=document.getElementById('ivMth').value;inv.st=st;}
+    toast('✅ تم تعديل الفاتورة');
+  } else {
+    invoices.unshift({id:IDs.inv++,pt:patients.find(p=>p.id==ptId)?.name||'',dr:doctors.find(d=>d.id==drId)?.name||'',total:net,paid,dis,mth:document.getElementById('ivMth').value,st});
+    if(paid>0)treasury.unshift({id:IDs.tr++,type:'income',cat:'فواتير',amt:paid,desc:`فاتورة #${IDs.inv-1}`,dt:nowT()});
+    toast('✅ تم حفظ الفاتورة');
+  }
+  closeM('mInv');renderInvoices();renderTreasury();
+  document.getElementById('invEditId').value='';
+  document.getElementById('mInvTitle').textContent='🧾 فاتورة جديدة';
 }
 
-function updateSvcPrice(sel) {
-  const opt = sel.options[sel.selectedIndex];
-  const price = opt.dataset.price || '';
-  const row = sel.closest('.service-row');
-  row.querySelector('.svc-price').value = price;
-  calcInvoiceTotal();
-}
-
-function calcInvoiceTotal() {
-  let total = 0;
-  document.querySelectorAll('.service-row').forEach(row => {
-    const price = parseFloat(row.querySelector('.svc-price').value) || 0;
-    const qty = parseFloat(row.querySelector('.svc-qty').value) || 1;
-    total += price * qty;
-  });
-  const discount = parseFloat(document.getElementById('inv-discount').value) || 0;
-  const net = total - discount;
-  document.getElementById('inv-total-display').textContent = net.toLocaleString() + ' ج';
-}
-
-function submitInvoice() {
-  closeModal('addInvoiceModal');
-  toast('✅ تم حفظ الفاتورة بنجاح');
-  loadInvoices(currentInvoiceFilter);
-}
-
-function payInvoice(id, remaining) {
-  toast(`💵 تم تسجيل دفعة ${remaining} ج للفاتورة #${id}`);
-  loadInvoices(currentInvoiceFilter);
-}
-
-// ── Treasury ──────────────────────────────────────────────────────────────────
-function loadTreasury() {
-  const {demoTreasury} = genDemoData();
-  const balance = demoTreasury.reduce((acc,t) => t.type==='income' ? acc+t.amount : acc-t.amount, 0);
-  document.getElementById('treasuryBalance').textContent = balance.toLocaleString() + ' ج';
-  
-  const tbody = document.getElementById('treasuryTable');
-  tbody.innerHTML = demoTreasury.map(t => `
+// TREASURY
+function renderTreasury(){
+  const bal=treasury.reduce((a,t)=>t.type==='income'?a+t.amt:a-t.amt,0);
+  document.getElementById('trBal').textContent=bal.toLocaleString()+' ج';
+  document.getElementById('trTbl').innerHTML=treasury.length?treasury.map(t=>`
     <tr>
       <td>#${t.id}</td>
-      <td><span class="badge badge-${t.type}">${t.type==='income'?'إيراد':'مصروف'}</span></td>
-      <td>${t.category}</td>
-      <td style="font-weight:700;color:${t.type==='income'?'var(--accent2)':'var(--danger)'};">
-        ${t.type==='income'?'+':'-'}${t.amount.toLocaleString()} ج
+      <td><span class="sb2 ${t.type==='income'?'si2':'sk'}">${t.type==='income'?'إيراد':'مصروف'}</span></td>
+      <td>${t.cat}</td>
+      <td style="font-weight:700;color:${t.type==='income'?'#22c55e':'#ef4444'};">${t.type==='income'?'+':'-'}${t.amt.toLocaleString()} ج</td>
+      <td>${t.desc}</td>
+      <td style="font-size:.71rem;color:#94a3b8;">${t.dt}</td>
+      <td style="display:flex;gap:4px;">
+        <button class="btn btn-w btn-sm" onclick="editTr(${t.id})">✏️ تعديل</button>
+        <button class="btn btn-d btn-sm" onclick="delTr(${t.id})">🗑️ حذف</button>
       </td>
-      <td>${t.description}</td>
-      <td style="font-size:.8rem;color:var(--text2);">${t.created_at}</td>
-    </tr>
-  `).join('');
+    </tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8;">لا توجد معاملات</td></tr>';
+  updateStats();
 }
 
-function openTreasury(type) {
-  treasuryType = type;
-  document.getElementById('treasuryModalTitle').textContent = type === 'income' ? '💰 إضافة إيراد' : '📤 تسجيل مصروف';
-  document.getElementById('treasurySubmitBtn').className = `btn ${type==='income'?'btn-success':'btn-danger'}`;
-  openModal('treasuryModal');
+function openTr(type){
+  trType=type;
+  document.getElementById('trMTitle').textContent=type==='income'?'💰 إضافة إيراد':'📤 تسجيل مصروف';
+  const btn=document.getElementById('trSvBtn');
+  btn.className='btn btn-sm '+(type==='income'?'btn-s':'btn-d');
+  document.getElementById('trEditId').value='';
+  document.getElementById('trAmt').value='';
+  document.getElementById('trDesc').value='';
+  openM('mTr');
 }
 
-function submitTreasury() {
-  const amount = document.getElementById('tr-amount').value;
-  if (!amount) { toast('⚠️ المبلغ مطلوب', 'warn'); return; }
-  closeModal('treasuryModal');
-  toast(`✅ تم تسجيل ${treasuryType==='income'?'الإيراد':'المصروف'} بنجاح`);
-  loadTreasury();
+function editTr(id){
+  const t=treasury.find(x=>x.id===id);if(!t)return;
+  trType=t.type;
+  document.getElementById('trMTitle').textContent=t.type==='income'?'✏️ تعديل إيراد':'✏️ تعديل مصروف';
+  document.getElementById('trEditId').value=id;
+  document.getElementById('trCat').value=t.cat;
+  document.getElementById('trAmt').value=t.amt;
+  document.getElementById('trDesc').value=t.desc;
+  document.getElementById('trSvBtn').className='btn btn-sm btn-w';
+  openM('mTr');
 }
 
-// ── Reports ───────────────────────────────────────────────────────────────────
-function loadDailyReport() {
-  const date = document.getElementById('reportDate').value;
-  document.getElementById('reportContent').style.display = 'block';
-  document.getElementById('rpt-income').textContent = '2,150 ج';
-  document.getElementById('rpt-expense').textContent = '350 ج';
-  document.getElementById('rpt-net').textContent = '1,800 ج';
-  
-  const {demoDoctors} = genDemoData();
-  document.getElementById('reportDoctors').innerHTML = demoDoctors.map(d => `
-    <tr>
-      <td><strong>${d.name}</strong></td>
-      <td>${d.specialty}</td>
-      <td>${Math.floor(Math.random()*5)+1}</td>
-      <td style="font-weight:700;">${(d.fee * (Math.floor(Math.random()*4)+1)).toLocaleString()} ج</td>
-      <td style="color:var(--accent2);font-weight:700;">${(d.fee * (Math.floor(Math.random()*3)+1)).toLocaleString()} ج</td>
-    </tr>
-  `).join('');
+function delTr(id){
+  confirm2('حذف هذه المعاملة؟','سيتم حذف المعاملة نهائياً من السجل',()=>{
+    treasury=treasury.filter(x=>x.id!==id);
+    renderTreasury();toast('🗑️ تم حذف المعاملة');
+  });
 }
 
-// ── Telegram ──────────────────────────────────────────────────────────────────
-function loadDoctorsBotList() {
-  const {demoDoctors} = genDemoData();
-  document.getElementById('doctorsBotList').innerHTML = demoDoctors.map(d => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#f7fafc;border-radius:8px;">
-      <div>
-        <div style="font-weight:700;font-size:.9rem;">${d.name}</div>
-        <div style="font-size:.75rem;color:var(--text2);">${d.specialty}</div>
+function saveTr(){
+  const amt=parseFloat(document.getElementById('trAmt').value)||0;
+  if(!amt){toast('⚠️ أدخل المبلغ');return;}
+  const editId=parseInt(document.getElementById('trEditId').value)||0;
+  if(editId){
+    const t=treasury.find(x=>x.id===editId);
+    if(t){t.type=trType;t.cat=document.getElementById('trCat').value;t.amt=amt;t.desc=document.getElementById('trDesc').value||'—';}
+    toast('✅ تم تعديل المعاملة');
+  } else {
+    treasury.unshift({id:IDs.tr++,type:trType,cat:document.getElementById('trCat').value,amt,desc:document.getElementById('trDesc').value||'—',dt:nowT()});
+    toast(`✅ تم تسجيل ${trType==='income'?'الإيراد':'المصروف'}`);
+  }
+  closeM('mTr');renderTreasury();
+}
+
+// BOT
+function renderDrBot(){
+  document.getElementById('drBotList').innerHTML=doctors.map(d=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 9px;background:#f8fafc;border-radius:7px;margin-bottom:5px;">
+      <div><div style="font-size:.8rem;font-weight:700;">${d.name}</div><div style="font-size:.7rem;color:#94a3b8;">${d.sp}</div></div>
+      <div style="display:flex;gap:5px;align-items:center;">
+        <input placeholder="Chat ID" value="${d.tg}" style="width:82px;padding:4px 7px;border:1.5px solid #e2e8f0;border-radius:5px;font-family:'Cairo',sans-serif;font-size:.7rem;direction:ltr;background:#fff;">
+        <button class="btn btn-g btn-sm" onclick="toast('✅ تم الحفظ')">حفظ</button>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="text" placeholder="Chat ID" value="${d.telegram_chat_id || ''}" 
-               style="padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:.8rem;width:120px;">
-        <button class="btn btn-accent btn-sm" onclick="toast('✅ تم حفظ Chat ID')">حفظ</button>
-      </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-function saveBotConfig() {
-  const token = document.getElementById('botToken').value;
-  const chatId = document.getElementById('adminChatId').value;
-  if (!token || !chatId) { toast('⚠️ يرجى إدخال البيانات', 'warn'); return; }
-  toast('✅ تم حفظ إعدادات البوت');
+function showReport(){
+  document.getElementById('rpBody').style.display='block';
+  const inc=treasury.filter(t=>t.type==='income').reduce((a,t)=>a+t.amt,0);
+  const exp=treasury.filter(t=>t.type==='expense').reduce((a,t)=>a+t.amt,0);
+  document.getElementById('rInc').textContent=inc.toLocaleString();
+  document.getElementById('rExp').textContent=exp.toLocaleString();
+  document.getElementById('rNet').textContent=(inc-exp).toLocaleString();
+  document.getElementById('rCnt').textContent=appts.filter(a=>a.dt===today).length;
+  document.getElementById('rpDrs').innerHTML=doctors.map(d=>{
+    const cnt=appts.filter(a=>a.drName===d.name&&a.dt===today).length;
+    const rev=cnt*d.fee;
+    return `<tr><td><strong>${d.name}</strong></td><td>${d.sp}</td><td>${cnt}</td><td style="font-weight:700;">${rev.toLocaleString()} ج</td><td style="color:#22c55e;font-weight:700;">${Math.round(rev*.8).toLocaleString()} ج</td></tr>`;
+  }).join('');
 }
 
-function sendReport(type) {
-  const labels = {admin:'للأدمن',doctors:'للأطباء',all:'للكل'};
-  toast(`📤 جاري إرسال التقرير ${labels[type]}...`);
-  setTimeout(() => toast('✅ تم الإرسال بنجاح'), 1500);
-}
+// MODAL
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-function statusLabel(s) {
-  return {pending:'⏳ منتظر',confirmed:'✅ مؤكد',completed:'✔️ منتهي',cancelled:'❌ ملغي'}[s] || s;
+// CONFIRM
+function confirm2(title,msg,cb){
+  document.getElementById('confirmTitle').textContent=title;
+  document.getElementById('confirmMsg').textContent=msg;
+  confirmCB=cb;
+  document.getElementById('confirmOverlay').classList.add('open');
+  document.getElementById('confirmOkBtn').onclick=()=>{confirmCB&&confirmCB();closeConfirm();};
 }
-function invStatusLabel(s) {
-  return {paid:'✅ مسددة',partial:'⚠️ جزئية',unpaid:'❌ غير مسددة'}[s] || s;
-}
-function paymentLabel(p) {
-  return {cash:'💵 كاش',card:'💳 بطاقة',transfer:'🏦 تحويل',vodafone:'📱 فودافون'}[p] || p;
-}
+function closeConfirm(){document.getElementById('confirmOverlay').classList.remove('open');confirmCB=null;}
 
-// ── Modal ─────────────────────────────────────────────────────────────────────
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-  if (id === 'addApptModal') populateApptSelects();
-  if (id === 'addInvoiceModal') { loadInvoices(); updateSvcSelects(); calcInvoiceTotal(); }
-}
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
-});
+// TOAST
+let toastTm;
+function toast(msg){const el=document.getElementById('toastEl');el.textContent=msg;el.classList.add('show');clearTimeout(toastTm);toastTm=setTimeout(()=>el.classList.remove('show'),2800);}
 
-// ── Toast ─────────────────────────────────────────────────────────────────────
-let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
-}
+// HELPERS
+function stL(s){return{pending:'⏳ منتظر',conf:'✅ مؤكد',done:'✔️ منتهي',canc:'❌ ملغي'}[s]||s;}
+function stCls(s){return{pending:'sp',conf:'sc',done:'sd',canc:'sx'}[s]||'';}
+function invL(s){return{paid:'✅ مسددة',part:'⚠️ جزئية',unp:'❌ غير مسددة'}[s]||s;}
+function invStCls(s){return{paid:'si2',part:'sj',unp:'sk'}[s]||'';}
+function mthL(m){return{cash:'💵 كاش',card:'💳 بطاقة',vf:'📱 فودافون',tr:'🏦 تحويل'}[m]||m;}
+function nowT(){return new Date().toTimeString().slice(0,5);}
 
-// ── Auto-login check ──────────────────────────────────────────────────────────
-window.addEventListener('keypress', e => { if (e.key === 'Enter') { 
-  if (document.getElementById('loginPage').style.display !== 'none') doLogin(); 
-}});
+document.addEventListener('keypress',e=>{if(e.key==='Enter'&&document.getElementById('loginPage').style.display!=='none')doLogin();});
 </script>
 </body>
 </html>
